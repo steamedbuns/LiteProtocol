@@ -9,6 +9,9 @@ public class Communicator {
 	private static final int Recieve_Port = 10356;
 	private int id;
 	private int group;
+	private DatagramSocket listener;
+	private DatagramSocket broadcastSocket;
+	private ServerSocket serverSocket;
 	private List<BroadcastListener> broadcastListeners;
 	private List<ControlListener> controlListeners;
 	private Object broadcastSyncObject;
@@ -25,15 +28,29 @@ public class Communicator {
 		this.broadcastSyncObject = new Object();
 		this.controlSyncObject = new Object();
 		
-		this.broadcastListenThread = new BroadcastListenThread();
-		this.broadcastListenThread.start();
-		
-		if(id >= 0) {		
-			this.controlReciveThread = new ControlReciveThread();
-			this.controlReciveThread.start();
+		try {
+			listener = new DatagramSocket(Broadcast.BROADCAST_PORT);
+			broadcastSocket = new DatagramSocket();
+			serverSocket = new ServerSocket(Recieve_Port);
+			serverSocket.setSoTimeout(30000);
+		} catch (SocketException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(listener != null && broadcastSocket != null && serverSocket != null) {
+			this.broadcastListenThread = new BroadcastListenThread();
+			this.broadcastListenThread.start();
 			
-			this.broadcastMessageThread = new BroadcastMessageThread();
-			this.broadcastMessageThread.start();
+			if(id >= 0) {		
+				this.controlReciveThread = new ControlReciveThread();
+				this.controlReciveThread.start();
+				
+				this.broadcastMessageThread = new BroadcastMessageThread();
+				this.broadcastMessageThread.start();
+			}
 		}
 	}
 	
@@ -90,22 +107,19 @@ public class Communicator {
 		public void run() {
 			try {
 				byte reciveData[] = new byte[10];
-				DatagramSocket listener = new DatagramSocket(Broadcast.BROADCAST_PORT);
+				
 				while(listen) {
 					DatagramPacket packet = new DatagramPacket(reciveData, reciveData.length);
 					listener.receive(packet);
 					notifyBroadcastRecived(new Broadcast(packet));
 				}
-				listener.close();
-			} catch (SocketException e) {
-				System.out.println("Could not listen for broadcast");
 			} catch (IOException e) {
-				System.out.println("Could not listen for broadcast");
 			}
 		}
 		
 		public void stopListening() {
 			this.listen = false;
+			listener.close();
 		}
 	}
 	
@@ -115,68 +129,51 @@ public class Communicator {
 		
 		public void run() {
 			try {
-				InetAddress localHost = Inet4Address.getLocalHost();
-				NetworkInterface networkInterface = NetworkInterface.getByInetAddress(localHost);
-				DatagramSocket broadcastSocket = new DatagramSocket();
+				Enumeration<NetworkInterface> net = NetworkInterface.getNetworkInterfaces();
+				NetworkInterface next = net.nextElement();
 				while(broadcast) {
-					for(InterfaceAddress address : networkInterface.getInterfaceAddresses()) {
-						try {
-							if(!address.getBroadcast().isLoopbackAddress())
-								broadcastSocket.send(Broadcast.createDatagramPacket(id, group, (short)Recieve_Port, address.getBroadcast()));
-							
-						} catch (IOException e) {
-							
-						} catch (NullPointerException e) {
-							
-						}
+					try{
+						broadcastSocket.send(Broadcast.createDatagramPacket(id, group, (short)Recieve_Port, next.getInterfaceAddresses().get(0).getBroadcast()));
+					} catch (IOException e) {
+					} catch (NullPointerException e) {
+						System.out.println("Something was null.");
 					}
-					Thread.sleep(2000);
+					Thread.sleep(250);
 				}
-
-				broadcastSocket.close();
-			} catch (UnknownHostException e) {
-				System.out.println("Could not send broadcast.");
-			} catch (SocketException e) {
-				System.out.println("Could not send broadcast.");
 			} catch (InterruptedException e) {
 				System.out.println("Broadcast Thread would not sleep.");
+			} catch (NullPointerException e) {
+			} catch (SocketException e1) {
 			} 
 			
 		}
 		
 		public void stopTransmitting() {
 			this.broadcast = false;
+			broadcastSocket.close();
 		}
 	}
 	
 	private class ControlReciveThread extends Thread {
-		
 		private boolean recieve = true;
 		
 		public void run() {
-			try {
-				ServerSocket serverSocket = new ServerSocket(Recieve_Port);
-				serverSocket.setSoTimeout(30000);
-				while(recieve) {
-					try {
-						Socket connection = serverSocket.accept();
-						connection.close();
-						System.out.println("Recieved Control Message.");
-					}
-					catch(SocketTimeoutException e) { }
-				}
-				
-				serverSocket.close();
-				
-			} catch (IOException e) {
-				System.out.println("Could not setup control recieve socket.");
-			} 
+			while(recieve) {
+				try {
+					Socket connection = serverSocket.accept();
+					connection.close();
+				} catch(SocketTimeoutException e) {
+				} catch (IOException e) {
+				} 
+			}
 		}
 		
 		public void stopRecieving() {
 			this.recieve = false;
+			try {
+				serverSocket.close();
+			} catch (IOException e) {
+			}
 		}
-		
 	}
-	
 }
