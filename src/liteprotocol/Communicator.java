@@ -117,7 +117,6 @@ public class Communicator {
 				NetworkInterface networkInterface = NetworkInterface.getByInetAddress(localHost);
 				DatagramSocket broadcastSocket = new DatagramSocket();
 				while(broadcast) {
-					if(networkInterface.getInterfaceAddresses() == null)
 					for(InterfaceAddress address : networkInterface.getInterfaceAddresses())
 						try {
 							if(!address.getBroadcast().isLoopbackAddress()){
