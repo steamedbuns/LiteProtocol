@@ -126,10 +126,12 @@ public class Communicator {
 				NetworkInterface networkInterface = NetworkInterface.getByInetAddress(localHost);
 				
 				DatagramSocket broadcastSocket = new DatagramSocket();
-				
+				System.out.println("Started");
 				while(broadcast) {
 					for(InterfaceAddress address : networkInterface.getInterfaceAddresses())
 						try {
+							Broadcast packet = new Broadcast(Broadcast.createDatagramPacket(id, group, (short)port, address.getBroadcast()));
+							System.out.println("Sending : " + packet);
 							broadcastSocket.send(Broadcast.createDatagramPacket(id, group, (short)port, address.getBroadcast()));
 						} catch (IOException e) {
 						}
