@@ -7,25 +7,34 @@ import java.net.*;
 public class Communicator {
 
 	private int id;
+	private int group;
+	private int port;
 	private List<BroadcastListener> broadcastListeners;
 	private List<ControlListener> controlListeners;
 	private Object broadcastSyncObject;
 	private Object controlSyncObject;
 	private BroadcastListenThread broadcastListenThread;
+	private BroadcastMessageThread broadcastMessageThread;
 	
 	public Communicator(int id) {
 		this.id = id;
+		this.group = 0;
+		this.port = 0;
 		this.broadcastListeners = new LinkedList<BroadcastListener>();
 		this.controlListeners = new LinkedList<ControlListener>();
 		this.broadcastSyncObject = new Object();
 		this.controlSyncObject = new Object();
 				
-		broadcastListenThread = new BroadcastListenThread();
-		broadcastListenThread.start();
+		this.broadcastListenThread = new BroadcastListenThread();
+		this.broadcastListenThread.start();
+		
+		this.broadcastMessageThread = new BroadcastMessageThread();
+		this.broadcastMessageThread.start();
 	}
 	
 	public void close() {
-		broadcastListenThread.stopListening();
+		this.broadcastListenThread.stopListening();
+		this.broadcastMessageThread.stopTransmitting();
 	}
 	
 	public synchronized void addBroadcastListener(BroadcastListener l) {
@@ -92,19 +101,25 @@ public class Communicator {
 		
 		public void run() {
 			try {
-				InetAddress sendAddress;
 				InetAddress localHost = Inet4Address.getLocalHost();
 				NetworkInterface networkInterface = NetworkInterface.getByInetAddress(localHost);
 				
+				DatagramSocket broadcastSocket = new DatagramSocket();
 				
+				while(broadcast) {
+					for(InterfaceAddress address : networkInterface.getInterfaceAddresses())
+						try {
+							broadcastSocket.send(Broadcast.createDatagramPacket(id, group, port, address.getBroadcast()));
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+				}
 
-			
+				broadcastSocket.close();
 				
 			} catch (UnknownHostException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (SocketException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			

@@ -4,6 +4,7 @@
 package liteprotocol;
 
 import java.net.DatagramPacket;
+import java.net.InetAddress;
 
 /**
  * @author Carl
@@ -11,6 +12,10 @@ import java.net.DatagramPacket;
  */
 public class Broadcast {
 
+	public static DatagramPacket createDatagramPacket(int id, int group, int port, InetAddress address) {
+		return null;
+	}
+	
 	public Broadcast(DatagramPacket packet) {
 		
 	}
