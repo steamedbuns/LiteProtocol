@@ -8,7 +8,7 @@ import java.net.InetAddress;
 import java.nio.ByteBuffer;
 
 /**
- * @author Carl
+ * @author Carl/Qian
  *
  */
 public class Broadcast {

@@ -25,14 +25,16 @@ public class Communicator {
 		this.broadcastSyncObject = new Object();
 		this.controlSyncObject = new Object();
 		
-		this.controlReciveThread = new ControlReciveThread();
-		this.controlReciveThread.start();
-		
 		this.broadcastListenThread = new BroadcastListenThread();
 		this.broadcastListenThread.start();
 		
-		this.broadcastMessageThread = new BroadcastMessageThread();
-		this.broadcastMessageThread.start();
+		if(id >= 0) {		
+			this.controlReciveThread = new ControlReciveThread();
+			this.controlReciveThread.start();
+			
+			this.broadcastMessageThread = new BroadcastMessageThread();
+			this.broadcastMessageThread.start();
+		}
 	}
 	
 	public void close() {
@@ -117,27 +119,28 @@ public class Communicator {
 				NetworkInterface networkInterface = NetworkInterface.getByInetAddress(localHost);
 				DatagramSocket broadcastSocket = new DatagramSocket();
 				while(broadcast) {
-					for(InterfaceAddress address : networkInterface.getInterfaceAddresses())
+					for(InterfaceAddress address : networkInterface.getInterfaceAddresses()) {
 						try {
-							if(!address.getBroadcast().isLoopbackAddress()){
-							broadcastSocket.send(Broadcast.createDatagramPacket(id, group, (short)Recieve_Port, address.getBroadcast()));
-						}
-						}catch (IOException e) {
+							if(!address.getBroadcast().isLoopbackAddress())
+								broadcastSocket.send(Broadcast.createDatagramPacket(id, group, (short)Recieve_Port, address.getBroadcast()));
+							
+						} catch (IOException e) {
+							
 						} catch (NullPointerException e) {
+							
 						}
-
+					}
 					Thread.sleep(2000);
 				}
 
 				broadcastSocket.close();
-				
 			} catch (UnknownHostException e) {
 				System.out.println("Could not send broadcast.");
 			} catch (SocketException e) {
 				System.out.println("Could not send broadcast.");
 			} catch (InterruptedException e) {
 				System.out.println("Broadcast Thread would not sleep.");
-			}
+			} 
 			
 		}
 		
