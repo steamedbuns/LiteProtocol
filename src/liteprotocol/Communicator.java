@@ -6,6 +6,7 @@ import java.net.*;
 
 public class Communicator {
 	
+	private static final int Recieve_Port = 10356;
 	private boolean portSet;
 	private int id;
 	private int group;
@@ -19,6 +20,8 @@ public class Communicator {
 	private ControlReciveThread controlReciveThread;
 	
 	public Communicator(int id) {
+		
+		
 		this.portSet = false;
 		this.id = id;
 		this.group = 0;
@@ -132,9 +135,9 @@ public class Communicator {
 				while(broadcast) {
 					for(InterfaceAddress address : networkInterface.getInterfaceAddresses())
 						try {
-							Broadcast packet = new Broadcast(Broadcast.createDatagramPacket(id, group, (short)port, address.getBroadcast()));
+							Broadcast packet = new Broadcast(Broadcast.createDatagramPacket(id, group, (short)Recieve_Port, address.getBroadcast()));
 							System.out.println("Sending : " + packet);
-							broadcastSocket.send(Broadcast.createDatagramPacket(id, group, (short)port, address.getBroadcast()));
+							broadcastSocket.send(Broadcast.createDatagramPacket(id, group, (short)Recieve_Port, address.getBroadcast()));
 						} catch (IOException e) {
 						}
 
@@ -164,7 +167,7 @@ public class Communicator {
 		
 		public void run() {
 			try {
-				ServerSocket serverSocket = new ServerSocket(0);
+				ServerSocket serverSocket = new ServerSocket(Recieve_Port);
 				setPort(serverSocket.getLocalPort());
 				serverSocket.setSoTimeout(30000);
 				while(recieve) {
