@@ -105,9 +105,9 @@ public class Communicator {
 				}
 				listener.close();
 			} catch (SocketException e) {
-				e.printStackTrace();
+				System.out.println("Could not listen for broadcast");
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.out.println("Could not listen for broadcast");
 			}
 		}
 		
@@ -132,16 +132,19 @@ public class Communicator {
 						try {
 							broadcastSocket.send(Broadcast.createDatagramPacket(id, group, (short)port, address.getBroadcast()));
 						} catch (IOException e) {
-							e.printStackTrace();
 						}
+
+					Thread.sleep(2000);
 				}
 
 				broadcastSocket.close();
 				
 			} catch (UnknownHostException e) {
-				e.printStackTrace();
+				System.out.println("Could not send broadcast.");
 			} catch (SocketException e) {
-				e.printStackTrace();
+				System.out.println("Could not send broadcast.");
+			} catch (InterruptedException e) {
+				System.out.println("Broadcast Thread would not sleep.");
 			}
 			
 		}
@@ -161,15 +164,19 @@ public class Communicator {
 				setPort(serverSocket.getLocalPort());
 				serverSocket.setSoTimeout(30000);
 				while(recieve) {
-					Socket connection = serverSocket.accept();
-					connection.close();
+					try {
+						Socket connection = serverSocket.accept();
+						connection.close();
+						System.out.println("Recieved Control Message.");
+					}
+					catch(SocketTimeoutException e) { }
 				}
 				
 				serverSocket.close();
 				
 			} catch (IOException e) {
-				e.printStackTrace();
-			}
+				System.out.println("Could not setup control recieve socket.");
+			} 
 		}
 		
 		public void stopRecieving() {
