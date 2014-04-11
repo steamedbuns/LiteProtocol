@@ -36,7 +36,7 @@ public class Broadcast {
 	
 	public Broadcast(DatagramPacket packet) {
 		byte[] data = packet.getData();
-		if(data.length != 10) {
+		if(data.length == 10) {
 			this.address = packet.getAddress();
 			this.id = getId(data);
 			this.group = getGroup(data);
