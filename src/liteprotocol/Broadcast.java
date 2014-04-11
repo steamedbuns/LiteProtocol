@@ -99,6 +99,6 @@ public class Broadcast {
 	}
 
 	public String toString() {
-		return "[ID: " + id + ", Group: " + group + ", Port: " + ", IP: " + address.getHostAddress() + "]";
+		return "[ID: " + id + ", Group: " + group + ", Port: " + this.port + ", IP: " + address.getHostAddress() + "]";
 	}
 }

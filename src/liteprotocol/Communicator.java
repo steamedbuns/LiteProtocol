@@ -125,6 +125,7 @@ public class Communicator {
 							System.out.println("Sending : " + packet);
 							broadcastSocket.send(Broadcast.createDatagramPacket(id, group, (short)Recieve_Port, address.getBroadcast()));
 						} catch (IOException e) {
+						} catch (NullPointerException e) {
 						}
 
 					Thread.sleep(2000);
