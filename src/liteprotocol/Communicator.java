@@ -32,6 +32,8 @@ public class Communicator {
 		
 		while(!portSet);
 		
+		System.out.println("Port Set");
+		
 		this.broadcastListenThread = new BroadcastListenThread();
 		this.broadcastListenThread.start();
 		
