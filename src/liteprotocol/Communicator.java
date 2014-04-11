@@ -5,11 +5,11 @@ import java.io.IOException;
 import java.net.*;
 
 public class Communicator {
-
+	
 	private boolean portSet;
 	private int id;
 	private int group;
-	private short port;
+	private int port;
 	private List<BroadcastListener> broadcastListeners;
 	private List<ControlListener> controlListeners;
 	private Object broadcastSyncObject;
@@ -97,7 +97,7 @@ public class Communicator {
 		public void run() {
 			try {
 				byte reciveData[] = new byte[10];
-				DatagramSocket listener = new DatagramSocket(10270);
+				DatagramSocket listener = new DatagramSocket(Broadcast.BROADCAST_PORT);
 				while(listen) {
 					DatagramPacket packet = new DatagramPacket(reciveData, reciveData.length);
 					listener.receive(packet);
@@ -130,7 +130,7 @@ public class Communicator {
 				while(broadcast) {
 					for(InterfaceAddress address : networkInterface.getInterfaceAddresses())
 						try {
-							broadcastSocket.send(Broadcast.createDatagramPacket(id, group, port, address.getBroadcast()));
+							broadcastSocket.send(Broadcast.createDatagramPacket(id, group, (short)port, address.getBroadcast()));
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
