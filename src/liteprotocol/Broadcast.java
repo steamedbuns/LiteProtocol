@@ -101,4 +101,10 @@ public class Broadcast {
 	public String toString() {
 		return "[ID: " + id + ", Group: " + group + ", Port: " + this.port + ", IP: " + address.getHostAddress() + "]";
 	}
+	
+	public boolean equals(Object o) {
+		Broadcast other = (Broadcast) o;
+		return this.id == other.id;
+		
+	}
 }
