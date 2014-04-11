@@ -8,7 +8,7 @@ public class Communicator {
 
 	private int id;
 	private int group;
-	private int port;
+	private short port;
 	private List<BroadcastListener> broadcastListeners;
 	private List<ControlListener> controlListeners;
 	private Object broadcastSyncObject;
