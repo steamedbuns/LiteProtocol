@@ -6,6 +6,7 @@ import java.net.*;
 
 public class Communicator {
 
+	private boolean portSet;
 	private int id;
 	private int group;
 	private int port;
@@ -15,16 +16,22 @@ public class Communicator {
 	private Object controlSyncObject;
 	private BroadcastListenThread broadcastListenThread;
 	private BroadcastMessageThread broadcastMessageThread;
+	private ControlReciveThread controlReciveThread;
 	
 	public Communicator(int id) {
+		this.portSet = false;
 		this.id = id;
 		this.group = 0;
-		this.port = 0;
 		this.broadcastListeners = new LinkedList<BroadcastListener>();
 		this.controlListeners = new LinkedList<ControlListener>();
 		this.broadcastSyncObject = new Object();
 		this.controlSyncObject = new Object();
-				
+		
+		this.controlReciveThread = new ControlReciveThread();
+		this.controlReciveThread.start();
+		
+		while(!portSet);
+		
 		this.broadcastListenThread = new BroadcastListenThread();
 		this.broadcastListenThread.start();
 		
@@ -33,8 +40,18 @@ public class Communicator {
 	}
 	
 	public void close() {
+		this.controlReciveThread.stopRecieving();
 		this.broadcastListenThread.stopListening();
 		this.broadcastMessageThread.stopTransmitting();
+		
+
+		try {
+			this.controlReciveThread.join();
+			this.broadcastListenThread.join();
+			this.broadcastMessageThread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public synchronized void addBroadcastListener(BroadcastListener l) {
@@ -68,6 +85,11 @@ public class Communicator {
 		}
 	}
 	
+	private void setPort(int port) {
+		this.port = port;
+		this.portSet = true;
+	}
+	
 	private class BroadcastListenThread extends Thread {
 		
 		private boolean listen = true;
@@ -85,7 +107,6 @@ public class Communicator {
 			} catch (SocketException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -130,5 +151,31 @@ public class Communicator {
 		}
 	}
 	
+	private class ControlReciveThread extends Thread {
+		
+		private boolean recieve = true;
+		
+		public void run() {
+			try {
+				ServerSocket serverSocket = new ServerSocket(0);
+				setPort(serverSocket.getLocalPort());
+				serverSocket.setSoTimeout(30000);
+				while(recieve) {
+					Socket connection = serverSocket.accept();
+					connection.close();
+				}
+				
+				serverSocket.close();
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		public void stopRecieving() {
+			this.recieve = false;
+		}
+		
+	}
 	
 }
