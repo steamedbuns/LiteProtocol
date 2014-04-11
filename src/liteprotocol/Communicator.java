@@ -7,10 +7,8 @@ import java.net.*;
 public class Communicator {
 	
 	private static final int Recieve_Port = 10356;
-	private boolean portSet;
 	private int id;
 	private int group;
-	private int port;
 	private List<BroadcastListener> broadcastListeners;
 	private List<ControlListener> controlListeners;
 	private Object broadcastSyncObject;
@@ -20,9 +18,6 @@ public class Communicator {
 	private ControlReciveThread controlReciveThread;
 	
 	public Communicator(int id) {
-		
-		
-		this.portSet = false;
 		this.id = id;
 		this.group = 0;
 		this.broadcastListeners = new LinkedList<BroadcastListener>();
@@ -32,10 +27,6 @@ public class Communicator {
 		
 		this.controlReciveThread = new ControlReciveThread();
 		this.controlReciveThread.start();
-		
-		while(!portSet);
-		
-		System.out.println("Port Set");
 		
 		this.broadcastListenThread = new BroadcastListenThread();
 		this.broadcastListenThread.start();
@@ -88,11 +79,6 @@ public class Communicator {
 			for(BroadcastListener bl : this.broadcastListeners)
 				bl.broadcastRecived(b);
 		}
-	}
-	
-	private void setPort(int port) {
-		this.port = port;
-		this.portSet = true;
 	}
 	
 	private class BroadcastListenThread extends Thread {
@@ -168,7 +154,6 @@ public class Communicator {
 		public void run() {
 			try {
 				ServerSocket serverSocket = new ServerSocket(Recieve_Port);
-				setPort(serverSocket.getLocalPort());
 				serverSocket.setSoTimeout(30000);
 				while(recieve) {
 					try {
