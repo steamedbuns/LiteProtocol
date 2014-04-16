@@ -15,6 +15,7 @@ public class Broadcast {
 
 	public final static int BROADCAST_PORT = 10270;
 	
+	private DatagramPacket data;
 	private InetAddress address;
 	private int id;
 	private int group;
@@ -35,6 +36,7 @@ public class Broadcast {
 	}
 	
 	public Broadcast(DatagramPacket packet) {
+		this.data = packet;
 		byte[] data = packet.getData();
 		if(data.length == 10) {
 			this.address = packet.getAddress();
@@ -100,6 +102,10 @@ public class Broadcast {
 
 	public String toString() {
 		return "[ID: " + id + ", Group: " + group + ", Port: " + this.port + ", IP: " + address.getHostAddress() + "]";
+	}
+	
+	public DatagramPacket getData() {
+		return this.data;
 	}
 	
 	public boolean equals(Object o) {

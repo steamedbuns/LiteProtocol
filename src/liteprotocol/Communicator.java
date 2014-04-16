@@ -100,6 +100,13 @@ public class Communicator {
 		}
 	}
 	
+	private void notifyBroadcastSent(Broadcast b) {
+		synchronized(this.broadcastSyncObject) {
+			for(BroadcastListener bl : this.broadcastListeners)
+				bl.broadcastSent(b);
+		}
+	}
+	
 	private class BroadcastListenThread extends Thread {
 		
 		private boolean listen = true;
@@ -133,6 +140,8 @@ public class Communicator {
 				NetworkInterface next = net.nextElement();
 				while(broadcast) {
 					try{
+						Broadcast send = new Broadcast(Broadcast.createDatagramPacket(id, group, (short)Recieve_Port, next.getInterfaceAddresses().get(0).getBroadcast()));
+						notifyBroadcastSent(send);
 						broadcastSocket.send(Broadcast.createDatagramPacket(id, group, (short)Recieve_Port, next.getInterfaceAddresses().get(0).getBroadcast()));
 					} catch (IOException e) {
 					} catch (NullPointerException e) {

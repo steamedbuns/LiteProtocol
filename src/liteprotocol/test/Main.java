@@ -18,6 +18,12 @@ public class Main {
 					if(b.getId() != id)
 						System.out.println(b);
 				}
+
+				@Override
+				public void broadcastSent(Broadcast b) {
+					// TODO Auto-generated method stub
+					System.out.println(b);
+				}
 	
 			});
 	
