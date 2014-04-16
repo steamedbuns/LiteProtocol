@@ -16,13 +16,13 @@ public class Main {
 	
 				public void broadcastRecived(Broadcast b) {
 					if(b.getId() != id)
-						System.out.println(b);
+						System.out.println("Received: " + b);
 				}
 
 				@Override
 				public void broadcastSent(Broadcast b) {
 					// TODO Auto-generated method stub
-					System.out.println(b);
+					System.out.println("Sent: " + b);
 				}
 	
 			});
@@ -33,6 +33,7 @@ public class Main {
 				}
 			});
 		}
+		
 		else {
 			System.out.println("Please enter an id.");
 			System.exit(0);
