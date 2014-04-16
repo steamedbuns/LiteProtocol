@@ -4,13 +4,14 @@ import java.util.*;
 import java.io.IOException;
 import java.net.*;
 
-public class Communicator {
+public class Communicator{
 	
 	private static final int Recieve_Port = 10356;
+	private InetAddress mcGroup;
 	private int id;
 	private int group;
-	private DatagramSocket listener;
-	private DatagramSocket broadcastSocket;
+	private MulticastSocket listener;
+	private MulticastSocket broadcastSocket;
 	private ServerSocket serverSocket;
 	private List<BroadcastListener> broadcastListeners;
 	private List<ControlListener> controlListeners;
@@ -27,30 +28,19 @@ public class Communicator {
 		this.controlListeners = new LinkedList<ControlListener>();
 		this.broadcastSyncObject = new Object();
 		this.controlSyncObject = new Object();
-		
 		try {
-			listener = new DatagramSocket(Broadcast.BROADCAST_PORT);
-			broadcastSocket = new DatagramSocket();
-			serverSocket = new ServerSocket(Recieve_Port);
-			serverSocket.setSoTimeout(30000);
-		} catch (SocketException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			mcGroup = InetAddress.getByName("224.0.0.1");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		if(listener != null && broadcastSocket != null && serverSocket != null) {
-			this.broadcastListenThread = new BroadcastListenThread();
-			this.broadcastListenThread.start();
+		this.broadcastListenThread = new BroadcastListenThread();
+		this.broadcastListenThread.start();
+		if(id >= 0) {		
+			this.controlReciveThread = new ControlReciveThread();
+			this.controlReciveThread.start();
 			
-			if(id >= 0) {		
-				this.controlReciveThread = new ControlReciveThread();
-				this.controlReciveThread.start();
-				
-				this.broadcastMessageThread = new BroadcastMessageThread();
-				this.broadcastMessageThread.start();
-			}
+			this.broadcastMessageThread = new BroadcastMessageThread();
+			this.broadcastMessageThread.start();
 		}
 	}
 	
@@ -106,19 +96,26 @@ public class Communicator {
 		
 		public void run() {
 			try {
+				listener = new MulticastSocket(Broadcast.BROADCAST_PORT);
+				listener.joinGroup(mcGroup);
 				byte reciveData[] = new byte[10];
-				
 				while(listen) {
 					DatagramPacket packet = new DatagramPacket(reciveData, reciveData.length);
 					listener.receive(packet);
 					notifyBroadcastRecived(new Broadcast(packet));
 				}
 			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 		
 		public void stopListening() {
 			this.listen = false;
+			try {
+				listener.leaveGroup(mcGroup);
+			} catch (IOException e) {
+				System.out.println("Could not leave group.");
+			}
 			listener.close();
 		}
 	}
@@ -129,53 +126,32 @@ public class Communicator {
 		
 		public void run() {
 			try {
-				List<InterfaceAddress> addrList = new ArrayList<InterfaceAddress>();
-				Enumeration<NetworkInterface> net = NetworkInterface.getNetworkInterfaces();
-				Iterator<NetworkInterface> iter = Collections.list(net).iterator();
-				while(iter.hasNext()) {
-					NetworkInterface next = iter.next();
-					if(!next.isLoopback() && !next.isPointToPoint() && next.isUp() && !next.isVirtual() && !next.getDisplayName().contains("Virtual")) {
-						Iterator<InterfaceAddress> it = next.getInterfaceAddresses().iterator();
-						while(it.hasNext()) {
-							addrList.add(it.next());
-						}
-					}
-				}
+				broadcastSocket = new MulticastSocket(Broadcast.BROADCAST_PORT);
+				broadcastSocket.joinGroup(mcGroup);
 				while(broadcast) {
 					try{
-						Iterator<InterfaceAddress> it = addrList.iterator();
-						while(it.hasNext()) {
-							InterfaceAddress addr = it.next();
-							if(addr.getBroadcast() != null && addr.getBroadcast().getAddress()[0] != 0 
-														   && addr.getBroadcast().getAddress()[1] != 0 
-														   && addr.getBroadcast().getAddress()[2] != 0 
-														   && addr.getBroadcast().getAddress()[3] != 0) {
-								broadcastSocket.send(Broadcast.createDatagramPacket(id, group, (short)Recieve_Port, addr.getBroadcast()));
-							}
-						}
-					} catch (NullPointerException e) {
-						System.out.println("Something was null.");
-					} catch (UnknownHostException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						System.out.println("Sent: " + new Broadcast(Broadcast.createDatagramPacket(id, group, (short) Recieve_Port, mcGroup)));
+						broadcastSocket.send(Broadcast.createDatagramPacket(id, group, (short) Recieve_Port, mcGroup));
+						Thread.sleep(1000);
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
-					}
-					Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						System.out.println("Thread interupted.");
+					} 
 				}
-			} catch (NullPointerException e) {
-				System.out.println("Something was null.");
-			} catch (SocketException e1) {
-				System.out.println("Could not create socket.");
-			} catch (InterruptedException e) {
-				System.out.println("Thread interupted.");
+			} catch (IOException e) {
+				e.printStackTrace();
 			} 
 			
 		}
 		
 		public void stopTransmitting() {
 			this.broadcast = false;
+			try {
+				broadcastSocket.leaveGroup(mcGroup);
+			} catch (IOException e) {
+				System.out.println("Could not leave group.");
+			}
 			broadcastSocket.close();
 		}
 	}
@@ -184,13 +160,19 @@ public class Communicator {
 		private boolean recieve = true;
 		
 		public void run() {
-			while(recieve) {
-				try {
-					Socket connection = serverSocket.accept();
-					connection.close();
-				} catch(SocketTimeoutException e) {
-				} catch (IOException e) {
-				} 
+			try{
+				serverSocket = new ServerSocket(Recieve_Port);
+				serverSocket.setSoTimeout(30000);
+				while(recieve) {
+					try {
+						Socket connection = serverSocket.accept();
+						connection.close();
+					} catch(SocketTimeoutException e) {
+					} catch (IOException e) {
+					} 
+				}
+			} catch(IOException e) {
+				
 			}
 		}
 		

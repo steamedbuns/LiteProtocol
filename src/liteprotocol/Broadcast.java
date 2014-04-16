@@ -15,7 +15,7 @@ import java.util.Date;
  */
 public class Broadcast {
 
-	public final static int BROADCAST_PORT = 10270;
+	public final static int BROADCAST_PORT = 6789;
 	
 	private DatagramPacket data;
 	private InetAddress address;
