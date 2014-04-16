@@ -153,7 +153,10 @@ public class Communicator {
 						Iterator<InterfaceAddress> it = addrList.iterator();
 						while(it.hasNext()) {
 							InterfaceAddress addr = it.next();
-							if(addr.getBroadcast() != null) {
+							if(addr.getBroadcast() != null && addr.getBroadcast().getAddress()[0] != 0 
+														   && addr.getBroadcast().getAddress()[1] != 0 
+														   && addr.getBroadcast().getAddress()[2] != 0 
+														   && addr.getBroadcast().getAddress()[3] != 0) {
 								Broadcast send = new Broadcast(Broadcast.createDatagramPacket(id, group, (short)Recieve_Port, addr.getBroadcast()));
 								broadcastSocket.send(Broadcast.createDatagramPacket(id, group, (short)Recieve_Port, addr.getBroadcast()));
 								notifyBroadcastSent(send);

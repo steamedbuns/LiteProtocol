@@ -6,6 +6,8 @@ package liteprotocol;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * @author Carl/Qian
@@ -20,6 +22,7 @@ public class Broadcast {
 	private int id;
 	private int group;
 	private int port;
+	private long timestamp;
 	
 	public static DatagramPacket createDatagramPacket(int id, int group, short port, InetAddress address) {
 		byte[] packet = new byte[10];
@@ -43,6 +46,7 @@ public class Broadcast {
 			this.id = getId(data);
 			this.group = getGroup(data);
 			this.port = getPort(data);
+			this.timestamp = System.currentTimeMillis();
 		}
 	}
 	
@@ -101,7 +105,9 @@ public class Broadcast {
 	}
 
 	public String toString() {
-		return "[ID: " + id + ", Group: " + group + ", Port: " + this.port + ", IP: " + address.getHostAddress() + "]";
+		SimpleDateFormat date = new SimpleDateFormat("HH:mm:ss");
+		Date d = new Date(timestamp);
+		return "Time: " + date.format(d) + "\n[ID: " + id + ", Group: " + group + ", Port: " + this.port + ", IP: " + address.getHostAddress() + "]";
 	}
 	
 	public DatagramPacket getData() {
@@ -112,5 +118,9 @@ public class Broadcast {
 		Broadcast other = (Broadcast) o;
 		return this.id == other.id;
 		
+	}
+	
+	public long getTime() {
+		return this.timestamp;
 	}
 }
