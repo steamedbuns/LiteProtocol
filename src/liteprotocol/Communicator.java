@@ -137,26 +137,36 @@ public class Communicator {
 		public void run() {
 			try {
 				Enumeration<NetworkInterface> net = NetworkInterface.getNetworkInterfaces();
-				NetworkInterface next = net.nextElement();
-				while(broadcast) {
-					try{
+				Iterator<NetworkInterface> iter = Collections.list(net).iterator();
+				while(iter.hasNext()) {
+					NetworkInterface next = iter.next();
+					if(!next.isLoopback() && !next.isPointToPoint() && next.isUp() && !next.isVirtual() && !next.getDisplayName().contains("Virtual")) {
+						System.out.println(next.getDisplayName());
 						Iterator<InterfaceAddress> it = next.getInterfaceAddresses().iterator();
 						while(it.hasNext()) {
-							InterfaceAddress addr = it.next();
-							if(addr.getBroadcast() != null) {
-								Broadcast send = new Broadcast(Broadcast.createDatagramPacket(id, group, (short)Recieve_Port, addr.getBroadcast()));
-								broadcastSocket.send(Broadcast.createDatagramPacket(id, group, (short)Recieve_Port, addr.getBroadcast()));
-								notifyBroadcastSent(send);
-							}
+							System.out.println(it.next().getNetworkPrefixLength());
 						}
-					} catch (IOException e) {
-					} catch (NullPointerException e) {
-						System.out.println("Something was null.");
 					}
-					Thread.sleep(250);
 				}
-			} catch (InterruptedException e) {
-				System.out.println("Broadcast Thread would not sleep.");
+//				while(broadcast) {
+//					try{
+//						Iterator<InterfaceAddress> it = next.getInterfaceAddresses().iterator();
+//						System.out.println(next.getInterfaceAddresses().size());
+//						while(it.hasNext()) {
+//							InterfaceAddress addr = it.next();
+//							System.out.println(addr);
+//							if(addr.getBroadcast() != null) {
+//								
+////								Broadcast send = new Broadcast(Broadcast.createDatagramPacket(id, group, (short)Recieve_Port, addr.getBroadcast()));
+////								broadcastSocket.send(Broadcast.createDatagramPacket(id, group, (short)Recieve_Port, addr.getBroadcast()));
+////								notifyBroadcastSent(send);
+//							}
+//						}
+//					} catch (NullPointerException e) {
+//						System.out.println("Something was null.");
+//					}
+//					Thread.sleep(1000);
+//				}
 			} catch (NullPointerException e) {
 			} catch (SocketException e1) {
 			} 
