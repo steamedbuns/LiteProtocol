@@ -130,7 +130,6 @@ public class Communicator{
 				broadcastSocket.joinGroup(mcGroup);
 				while(broadcast) {
 					try{
-						System.out.println("Sent: " + new Broadcast(Broadcast.createDatagramPacket(id, group, (short) Recieve_Port, mcGroup)));
 						broadcastSocket.send(Broadcast.createDatagramPacket(id, group, (short) Recieve_Port, mcGroup));
 						Thread.sleep(1000);
 					} catch (IOException e) {
