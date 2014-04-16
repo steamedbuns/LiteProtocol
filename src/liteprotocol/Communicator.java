@@ -140,9 +140,15 @@ public class Communicator {
 				NetworkInterface next = net.nextElement();
 				while(broadcast) {
 					try{
-						Broadcast send = new Broadcast(Broadcast.createDatagramPacket(id, group, (short)Recieve_Port, next.getInterfaceAddresses().get(0).getBroadcast()));
-						notifyBroadcastSent(send);
-						broadcastSocket.send(Broadcast.createDatagramPacket(id, group, (short)Recieve_Port, next.getInterfaceAddresses().get(0).getBroadcast()));
+						Iterator<InterfaceAddress> it = next.getInterfaceAddresses().iterator();
+						while(it.hasNext()) {
+							InterfaceAddress addr = it.next();
+							if(addr.getBroadcast() != null) {
+								Broadcast send = new Broadcast(Broadcast.createDatagramPacket(id, group, (short)Recieve_Port, addr.getBroadcast()));
+								broadcastSocket.send(Broadcast.createDatagramPacket(id, group, (short)Recieve_Port, addr.getBroadcast()));
+								notifyBroadcastSent(send);
+							}
+						}
 					} catch (IOException e) {
 					} catch (NullPointerException e) {
 						System.out.println("Something was null.");
