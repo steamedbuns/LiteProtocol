@@ -86,7 +86,7 @@ public class Communicator{
 	private void notifyBroadcastRecived(Multicast b) {
 		synchronized(this.broadcastSyncObject) {
 			for(MulticastListener bl : this.broadcastListeners)
-				bl.broadcastRecived(b);
+				bl.multicastReceived(b);
 		}
 	}
 	

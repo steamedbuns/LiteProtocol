@@ -14,7 +14,7 @@ public class Main {
 	
 			comm.addBroadcastListener(new MulticastListener() {
 	
-				public void broadcastRecived(Multicast b) {
+				public void multicastReceived(Multicast b) {
 					if(b.getId() != id)
 						System.out.println("Received: " + b);
 				}
