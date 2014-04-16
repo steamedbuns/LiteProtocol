@@ -136,39 +136,46 @@ public class Communicator {
 		
 		public void run() {
 			try {
+				List<InterfaceAddress> addrList = new ArrayList<InterfaceAddress>();
 				Enumeration<NetworkInterface> net = NetworkInterface.getNetworkInterfaces();
 				Iterator<NetworkInterface> iter = Collections.list(net).iterator();
 				while(iter.hasNext()) {
 					NetworkInterface next = iter.next();
 					if(!next.isLoopback() && !next.isPointToPoint() && next.isUp() && !next.isVirtual() && !next.getDisplayName().contains("Virtual")) {
-						System.out.println(next.getDisplayName());
 						Iterator<InterfaceAddress> it = next.getInterfaceAddresses().iterator();
 						while(it.hasNext()) {
-							System.out.println(it.next().getNetworkPrefixLength());
+							addrList.add(it.next());
 						}
 					}
 				}
-//				while(broadcast) {
-//					try{
-//						Iterator<InterfaceAddress> it = next.getInterfaceAddresses().iterator();
-//						System.out.println(next.getInterfaceAddresses().size());
-//						while(it.hasNext()) {
-//							InterfaceAddress addr = it.next();
-//							System.out.println(addr);
-//							if(addr.getBroadcast() != null) {
-//								
-////								Broadcast send = new Broadcast(Broadcast.createDatagramPacket(id, group, (short)Recieve_Port, addr.getBroadcast()));
-////								broadcastSocket.send(Broadcast.createDatagramPacket(id, group, (short)Recieve_Port, addr.getBroadcast()));
-////								notifyBroadcastSent(send);
-//							}
-//						}
-//					} catch (NullPointerException e) {
-//						System.out.println("Something was null.");
-//					}
-//					Thread.sleep(1000);
-//				}
+				while(broadcast) {
+					try{
+						Iterator<InterfaceAddress> it = addrList.iterator();
+						while(it.hasNext()) {
+							InterfaceAddress addr = it.next();
+							if(addr.getBroadcast() != null) {
+								Broadcast send = new Broadcast(Broadcast.createDatagramPacket(id, group, (short)Recieve_Port, addr.getBroadcast()));
+								broadcastSocket.send(Broadcast.createDatagramPacket(id, group, (short)Recieve_Port, addr.getBroadcast()));
+								notifyBroadcastSent(send);
+							}
+						}
+					} catch (NullPointerException e) {
+						System.out.println("Something was null.");
+					} catch (UnknownHostException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					Thread.sleep(1000);
+				}
 			} catch (NullPointerException e) {
+				System.out.println("Something was null.");
 			} catch (SocketException e1) {
+				System.out.println("Could not create socket.");
+			} catch (InterruptedException e) {
+				System.out.println("Thread interupted.");
 			} 
 			
 		}
