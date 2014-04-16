@@ -17,7 +17,6 @@ public class Multicast {
 
 	public final static int BROADCAST_PORT = 6789;
 	
-	private DatagramPacket data;
 	private InetAddress address;
 	private int id;
 	private int group;
@@ -39,7 +38,6 @@ public class Multicast {
 	}
 	
 	public Multicast(DatagramPacket packet) {
-		this.data = packet;
 		byte[] data = packet.getData();
 		if(data.length == 10) {
 			this.address = packet.getAddress();
@@ -108,10 +106,6 @@ public class Multicast {
 		SimpleDateFormat date = new SimpleDateFormat("HH:mm:ss");
 		Date d = new Date(timestamp);
 		return "Time: " + date.format(d) + "\n[ID: " + id + ", Group: " + group + ", Port: " + this.port + ", IP: " + address.getHostAddress() + "]";
-	}
-	
-	public DatagramPacket getData() {
-		return this.data;
 	}
 	
 	public boolean equals(Object o) {

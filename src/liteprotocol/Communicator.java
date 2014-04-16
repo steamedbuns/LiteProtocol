@@ -1,7 +1,10 @@
 package liteprotocol;
 
 import java.util.*;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.*;
 
 public class Communicator{
@@ -42,6 +45,11 @@ public class Communicator{
 			this.broadcastMessageThread = new BroadcastMessageThread();
 			this.broadcastMessageThread.start();
 		}
+	}
+	
+	public void sendMessage(String message, InetAddress addr, int port) {
+		ControlSendThread t = new ControlSendThread(message, addr, port);
+		t.start();
 	}
 	
 	public void close() {
@@ -161,17 +169,31 @@ public class Communicator{
 		public void run() {
 			try{
 				serverSocket = new ServerSocket(Recieve_Port);
-				serverSocket.setSoTimeout(30000);
 				while(recieve) {
 					try {
 						Socket connection = serverSocket.accept();
+						BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+						String message = reader.readLine();
+						reader.close();
 						connection.close();
+						if(message.equals("STOP")) {
+							System.out.println("Stopping broadcast.");
+							(new Thread(new Runnable() {
+
+								@Override
+								public void run() {
+									// TODO Auto-generated method stub
+									close();
+								}
+								
+							})).start();
+						}
 					} catch(SocketTimeoutException e) {
+						
 					} catch (IOException e) {
 					} 
 				}
 			} catch(IOException e) {
-				
 			}
 		}
 		
@@ -180,6 +202,31 @@ public class Communicator{
 			try {
 				serverSocket.close();
 			} catch (IOException e) {
+			}
+		}
+	}
+	
+	private class ControlSendThread extends Thread {
+		private String message;
+		private InetAddress addr;
+		private int port;
+		private Socket out;
+		public ControlSendThread(String message, InetAddress addr, int port) {
+			this.addr = addr;
+			this.port = port;
+			this.message = message;
+		}
+		
+		public void run() {
+			try {
+				out = new Socket(addr, port);
+				out.setKeepAlive(false);
+				PrintWriter o = new PrintWriter(out.getOutputStream());
+				o.println(message);
+				o.close();
+				out.close();
+			} catch (IOException e) {
+				System.out.println("Something went wrong.");
 			}
 		}
 	}
