@@ -177,23 +177,20 @@ public class Communicator{
 						reader.close();
 						connection.close();
 						if(message.equals("STOP")) {
-							System.out.println("Stopping broadcast.");
 							(new Thread(new Runnable() {
-
-								@Override
 								public void run() {
-									// TODO Auto-generated method stub
 									close();
 								}
-								
 							})).start();
 						}
 					} catch(SocketTimeoutException e) {
 						
 					} catch (IOException e) {
+						
 					} 
 				}
 			} catch(IOException e) {
+				
 			}
 		}
 		
