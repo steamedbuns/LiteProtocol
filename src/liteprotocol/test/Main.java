@@ -18,13 +18,6 @@ public class Main {
 					if(b.getId() != id)
 						System.out.println("Received: " + b);
 				}
-
-				@Override
-				public void broadcastSent(Broadcast b) {
-					// TODO Auto-generated method stub
-					System.out.println("Sent: " + b);
-				}
-	
 			});
 	
 			Runtime.getRuntime().addShutdownHook(new Thread() {

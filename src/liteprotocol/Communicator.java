@@ -100,13 +100,6 @@ public class Communicator {
 		}
 	}
 	
-	private void notifyBroadcastSent(Broadcast b) {
-		synchronized(this.broadcastSyncObject) {
-			for(BroadcastListener bl : this.broadcastListeners)
-				bl.broadcastSent(b);
-		}
-	}
-	
 	private class BroadcastListenThread extends Thread {
 		
 		private boolean listen = true;
@@ -157,9 +150,7 @@ public class Communicator {
 														   && addr.getBroadcast().getAddress()[1] != 0 
 														   && addr.getBroadcast().getAddress()[2] != 0 
 														   && addr.getBroadcast().getAddress()[3] != 0) {
-								Broadcast send = new Broadcast(Broadcast.createDatagramPacket(id, group, (short)Recieve_Port, addr.getBroadcast()));
 								broadcastSocket.send(Broadcast.createDatagramPacket(id, group, (short)Recieve_Port, addr.getBroadcast()));
-								notifyBroadcastSent(send);
 							}
 						}
 					} catch (NullPointerException e) {
