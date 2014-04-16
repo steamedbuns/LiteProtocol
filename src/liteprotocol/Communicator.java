@@ -13,7 +13,7 @@ public class Communicator{
 	private MulticastSocket listener;
 	private MulticastSocket broadcastSocket;
 	private ServerSocket serverSocket;
-	private List<BroadcastListener> broadcastListeners;
+	private List<MulticastListener> broadcastListeners;
 	private List<ControlListener> controlListeners;
 	private Object broadcastSyncObject;
 	private Object controlSyncObject;
@@ -24,7 +24,7 @@ public class Communicator{
 	public Communicator(int id) {
 		this.id = id;
 		this.group = 0;
-		this.broadcastListeners = new LinkedList<BroadcastListener>();
+		this.broadcastListeners = new LinkedList<MulticastListener>();
 		this.controlListeners = new LinkedList<ControlListener>();
 		this.broadcastSyncObject = new Object();
 		this.controlSyncObject = new Object();
@@ -59,7 +59,7 @@ public class Communicator{
 		}
 	}
 	
-	public synchronized void addBroadcastListener(BroadcastListener l) {
+	public synchronized void addBroadcastListener(MulticastListener l) {
 		synchronized(broadcastSyncObject) {
 			this.broadcastListeners.add(l);
 		}
@@ -83,9 +83,9 @@ public class Communicator{
 		}
 	}
 	
-	private void notifyBroadcastRecived(Broadcast b) {
+	private void notifyBroadcastRecived(Multicast b) {
 		synchronized(this.broadcastSyncObject) {
-			for(BroadcastListener bl : this.broadcastListeners)
+			for(MulticastListener bl : this.broadcastListeners)
 				bl.broadcastRecived(b);
 		}
 	}
@@ -96,13 +96,13 @@ public class Communicator{
 		
 		public void run() {
 			try {
-				listener = new MulticastSocket(Broadcast.BROADCAST_PORT);
+				listener = new MulticastSocket(Multicast.BROADCAST_PORT);
 				listener.joinGroup(mcGroup);
 				byte reciveData[] = new byte[10];
 				while(listen) {
 					DatagramPacket packet = new DatagramPacket(reciveData, reciveData.length);
 					listener.receive(packet);
-					notifyBroadcastRecived(new Broadcast(packet));
+					notifyBroadcastRecived(new Multicast(packet));
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -126,11 +126,11 @@ public class Communicator{
 		
 		public void run() {
 			try {
-				broadcastSocket = new MulticastSocket(Broadcast.BROADCAST_PORT);
+				broadcastSocket = new MulticastSocket(Multicast.BROADCAST_PORT);
 				broadcastSocket.joinGroup(mcGroup);
 				while(broadcast) {
 					try{
-						broadcastSocket.send(Broadcast.createDatagramPacket(id, group, (short) Recieve_Port, mcGroup));
+						broadcastSocket.send(Multicast.createDatagramPacket(id, group, (short) Recieve_Port, mcGroup));
 						Thread.sleep(1000);
 					} catch (IOException e) {
 						e.printStackTrace();

@@ -1,7 +1,7 @@
 package liteprotocol.test;
 
-import liteprotocol.Broadcast;
-import liteprotocol.BroadcastListener;
+import liteprotocol.Multicast;
+import liteprotocol.MulticastListener;
 import liteprotocol.Communicator;
 
 public class Main {
@@ -12,9 +12,9 @@ public class Main {
 
 			final Communicator comm = new Communicator(id);
 	
-			comm.addBroadcastListener(new BroadcastListener() {
+			comm.addBroadcastListener(new MulticastListener() {
 	
-				public void broadcastRecived(Broadcast b) {
+				public void broadcastRecived(Multicast b) {
 					if(b.getId() != id)
 						System.out.println("Received: " + b);
 				}

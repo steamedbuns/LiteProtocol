@@ -13,7 +13,7 @@ import java.util.Date;
  * @author Carl/Qian
  *
  */
-public class Broadcast {
+public class Multicast {
 
 	public final static int BROADCAST_PORT = 6789;
 	
@@ -38,7 +38,7 @@ public class Broadcast {
 		return new DatagramPacket(packet, packet.length, address, BROADCAST_PORT);
 	}
 	
-	public Broadcast(DatagramPacket packet) {
+	public Multicast(DatagramPacket packet) {
 		this.data = packet;
 		byte[] data = packet.getData();
 		if(data.length == 10) {
@@ -115,7 +115,7 @@ public class Broadcast {
 	}
 	
 	public boolean equals(Object o) {
-		Broadcast other = (Broadcast) o;
+		Multicast other = (Multicast) o;
 		return this.id == other.id;
 		
 	}
