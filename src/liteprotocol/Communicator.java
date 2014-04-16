@@ -105,7 +105,7 @@ public class Communicator{
 					notifyBroadcastRecived(new Multicast(packet));
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.out.println("Socket closed.");
 			}
 		}
 		
