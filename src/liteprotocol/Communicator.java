@@ -63,8 +63,9 @@ public class Communicator{
 			this.broadcastListenThread.join();
 			this.broadcastMessageThread.join();
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			
 		}
+		System.out.println("Done");
 	}
 	
 	public synchronized void addBroadcastListener(MulticastListener l) {
@@ -113,7 +114,6 @@ public class Communicator{
 					notifyBroadcastRecived(new Multicast(packet));
 				}
 			} catch (IOException e) {
-				System.out.println("Socket closed.");
 			}
 		}
 		
@@ -122,7 +122,7 @@ public class Communicator{
 			try {
 				listener.leaveGroup(mcGroup);
 			} catch (IOException e) {
-				System.out.println("Could not leave group.");
+				System.out.println(":(");
 			}
 			listener.close();
 		}
@@ -136,14 +136,14 @@ public class Communicator{
 			try {
 				broadcastSocket = new MulticastSocket(Multicast.BROADCAST_PORT);
 				broadcastSocket.joinGroup(mcGroup);
+				broadcastSocket.setTimeToLive(30);
+				broadcastSocket.setBroadcast(true);
 				while(broadcast) {
 					try{
 						broadcastSocket.send(Multicast.createDatagramPacket(id, group, (short) Recieve_Port, mcGroup));
 						Thread.sleep(1000);
 					} catch (IOException e) {
-						e.printStackTrace();
 					} catch (InterruptedException e) {
-						System.out.println("Thread interupted.");
 					} 
 				}
 			} catch (IOException e) {
@@ -157,7 +157,7 @@ public class Communicator{
 			try {
 				broadcastSocket.leaveGroup(mcGroup);
 			} catch (IOException e) {
-				System.out.println("Could not leave group.");
+				System.out.println(":(");
 			}
 			broadcastSocket.close();
 		}
@@ -179,7 +179,7 @@ public class Communicator{
 						if(message.equals("STOP")) {
 							(new Thread(new Runnable() {
 								public void run() {
-									close();
+									System.exit(0);
 								}
 							})).start();
 						}
