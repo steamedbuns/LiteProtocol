@@ -105,7 +105,7 @@ public class Multicast {
 	public String toString() {
 		SimpleDateFormat date = new SimpleDateFormat("HH:mm:ss");
 		Date d = new Date(timestamp);
-		return "Time: " + date.format(d) + "\n[ID: " + id + ", Group: " + group + ", Port: " + this.port + ", IP: " + address.getHostAddress() + "]";
+		return "Time: " + date.format(d) + "\n[ID: " + id;
 	}
 	
 	public boolean equals(Object o) {
