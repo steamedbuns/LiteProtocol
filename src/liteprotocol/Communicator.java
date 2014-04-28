@@ -106,7 +106,6 @@ public class Communicator{
 		public void run() {
 			try {
 				listener = new MulticastSocket(Multicast.BROADCAST_PORT);
-				listener.joinGroup(mcGroup);
 				byte reciveData[] = new byte[10];
 				while(listen) {
 					DatagramPacket packet = new DatagramPacket(reciveData, reciveData.length);
@@ -135,7 +134,6 @@ public class Communicator{
 		public void run() {
 			try {
 				broadcastSocket = new MulticastSocket(Multicast.BROADCAST_PORT);
-				broadcastSocket.joinGroup(mcGroup);
 				broadcastSocket.setTimeToLive(30);
 				broadcastSocket.setBroadcast(true);
 				while(broadcast) {
@@ -173,16 +171,8 @@ public class Communicator{
 					try {
 						Socket connection = serverSocket.accept();
 						BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-						String message = reader.readLine();
 						reader.close();
 						connection.close();
-						if(message.equals("STOP")) {
-							(new Thread(new Runnable() {
-								public void run() {
-									System.exit(0);
-								}
-							})).start();
-						}
 					} catch(SocketTimeoutException e) {
 						
 					} catch (IOException e) {
@@ -199,6 +189,7 @@ public class Communicator{
 			try {
 				serverSocket.close();
 			} catch (IOException e) {
+				System.out.println("Error while trying to close Server socket.");
 			}
 		}
 	}
