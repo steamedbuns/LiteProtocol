@@ -118,11 +118,6 @@ public class Communicator{
 		
 		public void stopListening() {
 			this.listen = false;
-			try {
-				listener.leaveGroup(mcGroup);
-			} catch (IOException e) {
-				System.out.println(":(");
-			}
 			listener.close();
 		}
 	}
@@ -152,11 +147,6 @@ public class Communicator{
 		
 		public void stopTransmitting() {
 			this.broadcast = false;
-			try {
-				broadcastSocket.leaveGroup(mcGroup);
-			} catch (IOException e) {
-				System.out.println(":(");
-			}
 			broadcastSocket.close();
 		}
 	}
