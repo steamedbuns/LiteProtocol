@@ -1,4 +1,7 @@
-package liteprotocol;
+package liteprotocol.interfaces;
+
+import liteprotocol.Recipient;
+import liteprotocol.Toggle;
 
 public interface ServerListener {
 	

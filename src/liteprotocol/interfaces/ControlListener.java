@@ -1,4 +1,4 @@
-package liteprotocol;
+package liteprotocol.interfaces;
 
 import java.util.EventListener;
 

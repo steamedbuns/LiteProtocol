@@ -7,6 +7,9 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.*;
 
+import liteprotocol.interfaces.ControlListener;
+import liteprotocol.interfaces.MulticastListener;
+
 public class Communicator{
 	
 	private static final int Recieve_Port = 10356;

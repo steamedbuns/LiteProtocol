@@ -1,8 +1,8 @@
 package liteprotocol.test;
 
 import liteprotocol.Multicast;
-import liteprotocol.MulticastListener;
 import liteprotocol.Communicator;
+import liteprotocol.interfaces.MulticastListener;
 
 public class Main {
 

@@ -1,6 +1,10 @@
-package liteprotocol;
+package liteprotocol.interfaces;
 
 import java.util.Collection;
+
+import liteprotocol.LightState;
+import liteprotocol.Recipient;
+import liteprotocol.Toggle;
 
 public interface Server {
 	
