@@ -35,6 +35,8 @@ public interface Client {
 	
 	public boolean removeGroupToggle(int groupId, int toggleId);
 	
+	public boolean removeAllGroupToggles(int groupId, Collection<Integer> toggleIds);
+	
 	public boolean setLightEnableToggles(int lightId, boolean enabled);
 	
 	public boolean setGroupEnableToggles(int groupId, boolean enabled);
