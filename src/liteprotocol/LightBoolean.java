@@ -7,10 +7,10 @@ package liteprotocol;
  * @author Carl
  *
  */
-public class Boolean {
+public class LightBoolean {
 	private boolean value;
 	
-	public Boolean(boolean value) {
+	public LightBoolean(boolean value) {
 		this.value = value;
 	}
 	
@@ -21,8 +21,8 @@ public class Boolean {
 			return 0;
 	}
 	
-	public static Boolean deserialize(byte value) {
-		return new Boolean((value != (byte)0) ? true : false);
+	public static LightBoolean deserialize(byte value) {
+		return new LightBoolean((value != (byte)0) ? true : false);
 	}
 
 	/**
