@@ -7,7 +7,7 @@ public class Toggle {
 	private int id;
 	private Date on;
 	private Date off;
-	private byte frequency;
+	private Frequency frequency;
 	private LiteColor color;
 	
 	/**
@@ -18,7 +18,7 @@ public class Toggle {
 	 * @param blue
 	 * @param type
 	 */
-	public Toggle(int id, Date on, Date off, byte frequency, LiteColor color) {
+	public Toggle(int id, Date on, Date off, Frequency frequency, LiteColor color) {
 		this.id = id;
 		this.on = on;
 		this.off = off;
@@ -28,13 +28,22 @@ public class Toggle {
 	
 	public byte[] serialize() {
 		byte[] ret = new byte[25];
-		ByteBuffer buffer = new ByteBuffer(25);
+		
+		return null;
 	}
 	
-	public Toggle derserialize(byte[] values) {
+	public static Toggle derserialize(byte[] values) {
 		if(values.length != 25)
 			return null;
+		int id = 0;
+		Date on = null;
+		Date off = null;
+		Frequency freq = null;
+		LiteColor color = null;
 		
+		
+		
+		return new Toggle(id, on, off, freq, color);
 	}
 
 	/**
@@ -61,7 +70,7 @@ public class Toggle {
 	/**
 	 * @return the frequency
 	 */
-	public byte getFrequency() {
+	public Frequency getFrequency() {
 		return frequency;
 	}
 
