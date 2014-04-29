@@ -99,30 +99,6 @@ public class ClientCommunicator implements Client {
 	}
 
 	@Override
-	public boolean addLightToggle(int lightId, Toggle toggle) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean addGroupToggle(int groupId, Toggle toggle) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean removeLightToggle(int lightId, int toggleId) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean removeGroupToggle(int groupId, int toggleId) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
 	public boolean setLightEnableToggles(int lightId, boolean enabled) {
 		// TODO Auto-generated method stub
 		return false;
@@ -229,5 +205,24 @@ public class ClientCommunicator implements Client {
 			this.listen = false;
 			listener.close();
 		}
+	}
+
+	@Override
+	public boolean setLightToggles(int lightId, Collection<Toggle> toggle) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean setGroupToggles(int groupId, Collection<Toggle> toggle) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean removeAllGroupToggles(int groupId,
+			Collection<Integer> toggleIds) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
