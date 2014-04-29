@@ -22,6 +22,8 @@ public abstract class Server extends Thread {
 	
 	public abstract void sendReply(Recipient r);
 	
+	public abstract boolean setGroupId(int groupId);
+	
 	public boolean addServerListener(ServerListener l) {
 		synchronized(this.listenerSyncObject) {
 			return this.listerners.add(l);

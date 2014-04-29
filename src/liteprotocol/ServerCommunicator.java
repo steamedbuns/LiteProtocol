@@ -207,4 +207,10 @@ public class ServerCommunicator extends Server {
 			
 		}
 	}
+
+	@Override
+	public boolean setGroupId(int groupId) {
+		this.group = groupId;
+		return true;
+	}
 }
