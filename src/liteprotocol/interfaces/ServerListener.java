@@ -1,21 +1,20 @@
 package liteprotocol.interfaces;
 
+import java.util.Collection;
+
+import liteprotocol.LiteColor;
 import liteprotocol.Recipient;
 import liteprotocol.Toggle;
 
 public interface ServerListener {
 	
-	public boolean setGroup(int groupId);
+	public void setGroup(int groupId);
 	
-	public boolean setColor(byte on, byte red, byte green, byte blue);
+	public void setColor(LiteColor color);
 	
-	public boolean addToggle(Toggle toggle);
+	public void setToggles(Collection<Toggle> toggle);
 	
-	public boolean removeToggle(int toggleId);
-	
-	public boolean setEnableToggles(boolean enabled);
-	
-	public boolean setToggleEnabled(int toggleId, boolean enabled);
+	public void setEnabledToggles(boolean enabled);
 	
 	public void requestForState(Recipient r);
 	

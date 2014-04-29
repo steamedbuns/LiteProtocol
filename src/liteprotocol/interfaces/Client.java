@@ -1,7 +1,6 @@
 package liteprotocol.interfaces;
 
 import java.util.Collection;
-
 import liteprotocol.GroupState;
 import liteprotocol.LightState;
 import liteprotocol.LiteColor;

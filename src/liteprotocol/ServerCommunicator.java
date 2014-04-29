@@ -6,42 +6,20 @@ import java.net.MulticastSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.util.ArrayList;
 import java.util.Collection;
-
 import liteprotocol.interfaces.Server;
-import liteprotocol.interfaces.ServerListener;
 
-public class ServerCommunicator extends Thread implements Server{
+public class ServerCommunicator extends Server {
 	private static final int Recieve_Port = 10356;
-	private ArrayList<ServerListener> publish;
 	private ControlReceiveThread ctlReceiveThread;
 	private BroadcastMessageThread bcastThread;
 	private int id;
 	private int group;
 	
 	public ServerCommunicator(int id, int group) {
-		this.publish = new ArrayList<ServerListener>();
 		startThreads();
 		this.id = id;
 		this.group = group;
-	}
-	
-	@Override
-	public boolean sendState(Recipient r, LightState state) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean sendToggles(Recipient r, Collection<Toggle> c) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void addServerListener(ServerListener l) {
-		publish.add(l);
 	}
 	
 	public void startThreads() {
@@ -102,13 +80,7 @@ public class ServerCommunicator extends Thread implements Server{
 				while(recieve) {
 					try {
 						Socket connection = serverSocket.accept();
-						byte[] type = new byte[3];
-						connection.getInputStream().read(type, 0, 3);
-						connection.getInputStream().skip(1);
-						String word = new String(type);
-						if(word.equals("SET")) {
-							
-						}
+						byte[] header = new byte[2];
 						
 					} catch(SocketTimeoutException e) {
 						
@@ -129,5 +101,23 @@ public class ServerCommunicator extends Thread implements Server{
 				System.out.println("Error while trying to close Server socket.");
 			}
 		}
+	}
+
+	@Override
+	public boolean sendColor(Recipient r, LiteColor color) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean sendToggles(Recipient r, Collection<Toggle> c) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean sendReply(Recipient r) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
