@@ -382,7 +382,7 @@ public class ClientCommunicator implements Client {
 				return false;
 			byte[] header = { (byte)0x86, 0x00 };
 			byte[] data = new byte[1];
-			data[0] = (new Boolean(enabled)).serialize();
+			data[0] = (new LightBoolean(enabled)).serialize();
 			byte[] ret = transmitRequest(address, header, data);
 			if(ret.length == 2)
 				return ret[0] == header[0] && ret[1] == header[1];
@@ -406,7 +406,7 @@ public class ClientCommunicator implements Client {
 				return false;
 			byte[] header = { (byte)0x87, 0x00 };
 			byte[] data = new byte[1];
-			data[0] = (new Boolean(enabled)).serialize();
+			data[0] = (new LightBoolean(enabled)).serialize();
 			for(Multicast address : groupIds) {
 				try {
 					transmitRequest(address, header, data);

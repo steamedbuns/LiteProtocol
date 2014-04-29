@@ -1,8 +1,6 @@
 package liteprotocol.test;
 
-import liteprotocol.Multicast;
-import liteprotocol.Communicator;
-import liteprotocol.interfaces.MulticastListener;
+import liteprotocol.ServerCommunicator;
 
 public class Main {
 
@@ -10,19 +8,12 @@ public class Main {
 		if(args.length > 0){
 			final int id = Integer.parseInt(args[0]);
 
-			final Communicator comm = new Communicator(id);
-	
-			comm.addBroadcastListener(new MulticastListener() {
-	
-				public void multicastReceived(Multicast b) {
-					if(b.getId() != id)
-						System.out.println("Received: " + b);
-				}
-			});
+			final ServerCommunicator comm = new ServerCommunicator(id, 0);
+
 	
 			Runtime.getRuntime().addShutdownHook(new Thread() {
 				public void run() {
-					comm.close();
+					comm.stopThreads();
 				}
 			});
 		}

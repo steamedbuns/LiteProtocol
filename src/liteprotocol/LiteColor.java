@@ -8,7 +8,7 @@ package liteprotocol;
  *
  */
 public class LiteColor {
-	private Boolean on;
+	private LightBoolean on;
 	private byte red;
 	private byte green;
 	private byte blue;
@@ -19,7 +19,7 @@ public class LiteColor {
 	 * @param green
 	 * @param blue
 	 */
-	public LiteColor(Boolean on, byte red, byte green, byte blue) {
+	public LiteColor(LightBoolean on, byte red, byte green, byte blue) {
 		this.on = on;
 		this.red = red;
 		this.green = green;
@@ -38,13 +38,13 @@ public class LiteColor {
 	public static LiteColor deserialize(byte[] value) {
 		if(value.length != 4)
 			return null;
-		return new LiteColor(Boolean.deserialize(value[0]), value[1], value[2], value[3]);
+		return new LiteColor(LightBoolean.deserialize(value[0]), value[1], value[2], value[3]);
 	}
 
 	/**
 	 * @return the on
 	 */
-	public Boolean getOn() {
+	public LightBoolean getOn() {
 		return on;
 	}
 
