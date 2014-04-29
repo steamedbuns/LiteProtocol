@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import liteprotocol.GroupState;
 import liteprotocol.LightState;
+import liteprotocol.LiteColor;
 import liteprotocol.Toggle;
 
 
@@ -23,15 +24,15 @@ public interface Client {
 	
 	public boolean setLightGroup(int lightId, int groupId);
 	
-	public boolean setLightColor(int lightId, byte on, byte red, byte greeen, byte blue);
+	public boolean setLightColor(int lightId, LiteColor color);
 	
-	public boolean setGroupColor(int groupId, byte on, byte red, byte greeen, byte blue);
+	public boolean setGroupColor(int groupId, LiteColor color);
 	
 	public boolean setLightToggles(int lightId, Collection<Toggle> toggle);
 	
 	public boolean setGroupToggles(int groupId, Collection<Toggle> toggle);
 	
-	public boolean removeAllGroupToggles(int groupId, Collection<Integer> toggleIds);
+	public boolean removeAllGroupToggles(int groupId);
 	
 	public boolean setLightEnableToggles(int lightId, boolean enabled);
 	

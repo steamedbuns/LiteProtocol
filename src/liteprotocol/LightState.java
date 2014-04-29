@@ -4,10 +4,7 @@ public class LightState {
 
 	private int lightId;
 	private int groupId;
-	private boolean on;
-	private byte red;
-	private byte green;
-	private byte blue;
+	private LiteColor color;
 	
 	/**
 	 * @param lightId
@@ -17,14 +14,10 @@ public class LightState {
 	 * @param green
 	 * @param blue
 	 */
-	protected LightState(int lightId, int groupId, boolean on, byte red,
-			byte green, byte blue) {
+	protected LightState(int lightId, int groupId, LiteColor color) {
 		this.lightId = lightId;
 		this.groupId = groupId;
-		this.on = on;
-		this.red = red;
-		this.green = green;
-		this.blue = blue;
+		this.color = color;
 	}
 
 	/**
@@ -33,39 +26,15 @@ public class LightState {
 	public int getLightId() {
 		return lightId;
 	}
-
-	/**
-	 * @return the groupId
-	 */
+	
 	public int getGroupId() {
 		return groupId;
 	}
 
 	/**
-	 * @return the on
+	 * @return the color
 	 */
-	public boolean isOn() {
-		return on;
-	}
-
-	/**
-	 * @return the red
-	 */
-	public byte getRed() {
-		return red;
-	}
-
-	/**
-	 * @return the green
-	 */
-	public byte getGreen() {
-		return green;
-	}
-
-	/**
-	 * @return the blue
-	 */
-	public byte getBlue() {
-		return blue;
+	public LiteColor getColor() {
+		return color;
 	}
 }

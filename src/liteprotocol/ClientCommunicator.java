@@ -1,11 +1,20 @@
 package liteprotocol;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.MulticastSocket;
+import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -13,25 +22,25 @@ import liteprotocol.interfaces.Client;
 
 public class ClientCommunicator implements Client {
 	private static final long timeout = 5000;
-	private HashMap<Integer, Multicast> map;
+	private HashMap<Integer, Multicast> lightMap;
 	private BroadcastListenThread packetListenThread;
 	private SweepThread sweepThread;
 	private Object mapSyncObject;
-	
+
 	public ClientCommunicator() {
-		map = new HashMap<Integer, Multicast>();
+		lightMap = new HashMap<Integer, Multicast>();
 		startBroadcastListenThread();
 		startSweepThread();
 		mapSyncObject = new Object();
 	}
-	
+
 	public Collection<Integer> getAllLightIds() {
 		HashSet<Integer> lightIds = new HashSet<Integer>();
 		synchronized(this.mapSyncObject) {
-			if(map.size() == 0) {
+			if(lightMap.size() == 0) {
 				return null;
 			}
-			Set<Entry<Integer, Multicast>> entry = map.entrySet();
+			Set<Entry<Integer, Multicast>> entry = lightMap.entrySet();
 			for(Entry<Integer,Multicast> e : entry) {
 				lightIds.add(e.getKey());
 			}
@@ -42,62 +51,62 @@ public class ClientCommunicator implements Client {
 	public Collection<Integer> getAllGroupIds() {
 		HashSet<Integer> groupIds = new HashSet<Integer>();
 		synchronized(this.mapSyncObject) {
-			if(map.size() == 0) {
+			if(lightMap.size() == 0) {
 				return null;
 			}
-			Set<Entry<Integer, Multicast>> entry = map.entrySet();
+			Set<Entry<Integer, Multicast>> entry = lightMap.entrySet();
 			for(Entry<Integer,Multicast> e : entry) {
 				groupIds.add(e.getValue().getGroup());
 			}
 		}
 		return groupIds;
 	}
-	
+
 	public void startBroadcastListenThread() {
 		if(packetListenThread == null) {
 			packetListenThread = new BroadcastListenThread();
 			packetListenThread.start();
 		}
 	}
-	
+
 	public void startSweepThread() {
 		if(sweepThread == null) {
 			sweepThread = new SweepThread();
 			sweepThread.start();
 		}
 	}
-	
+
 	public void stopBroadcastListenThread() {
 		packetListenThread.stopThread();
 		packetListenThread = null;
 	}
-	
+
 	public void stopSweepThread() {
 		sweepThread.stopSweep();
 		sweepThread = null;
 	}
-	
+
 	private void packetReceived(Multicast packet) {
 		synchronized(this.mapSyncObject) {
-			map.put(Integer.valueOf(packet.getId()), packet);
+			lightMap.put(Integer.valueOf(packet.getId()), packet);
 		}
 	}
-	
+
 	private void sweep() {
 		synchronized(this.mapSyncObject) {
-			Set<Entry<Integer, Multicast>> entry = map.entrySet();
+			Set<Entry<Integer, Multicast>> entry = lightMap.entrySet();
 			for(Entry<Integer,Multicast> e : entry) {
 				long currTime = System.currentTimeMillis();
 				if((currTime - e.getValue().getTime()) > timeout) {
-					map.remove(e.getKey());
+					lightMap.remove(e.getKey());
 				}
 			}
 		}
 	}
-	
+
 	private class SweepThread extends Thread {
 		private boolean sweep = true;
-		
+
 		public void run() {
 			while(sweep) {
 				sweep();
@@ -107,16 +116,16 @@ public class ClientCommunicator implements Client {
 				}
 			}
 		}
-		
+
 		public void stopSweep() {
 			this.sweep = false;
 		}
 	}
-	
+
 	private class BroadcastListenThread extends Thread {
 		private MulticastSocket listener;
 		private boolean listen = true;
-		
+
 		public void run() {
 			try {
 				listener = new MulticastSocket(Multicast.BROADCAST_PORT);
@@ -129,7 +138,7 @@ public class ClientCommunicator implements Client {
 			} catch (IOException e) {
 			}
 		}
-		
+
 		public void stopThread() {
 			this.listen = false;
 			listener.close();
@@ -137,63 +146,302 @@ public class ClientCommunicator implements Client {
 	}
 
 	public LightState getLightState(int id) {
-		// TODO Auto-generated method stub
-		return null;
+		Multicast broadcast = null;
+		synchronized(this.mapSyncObject) {
+			broadcast = this.lightMap.get(Integer.valueOf(id));
+		}		
+		try {
+			byte[] header = {0x00, 0x01};
+			byte[] reply = transmitRequest(broadcast, header, null);
+			byte[] data = new byte[reply.length - 2];
+			System.arraycopy(reply, 2, data, 0, data.length);
+			return new LightState(broadcast.getId(), broadcast.getGroup(), LiteColor.deserialize(data));
+		}
+		catch (Exception e) {
+			return null;
+		}
 	}
 
 	public GroupState getGroup(int id) {
-		// TODO Auto-generated method stub
-		return null;
+		Set<Integer> lights = new HashSet<Integer>();
+		synchronized(this.mapSyncObject) {
+			for(Multicast m : this.lightMap.values()) {
+				if(m.getGroup() == id) {
+					lights.add(m.getId());
+				}
+			}
+		}
+		try {
+			if(lights.isEmpty())
+				return null;
+			LightState state = getLightState(lights.iterator().next().intValue());
+			return new GroupState(id, lights, state.getColor());
+		} catch (Exception e) {		
+			return null;
+		}
 	}
 
 	public Collection<Toggle> getGroupToggles(int id) {
-		// TODO Auto-generated method stub
-		return null;
+		Multicast destination = null;
+		synchronized(this.mapSyncObject) {
+			for(Multicast m : this.lightMap.values()) {
+				if(m.getGroup() == id) {
+					destination = m;
+					break;
+				}
+			}
+		}
+		if(destination == null)
+			return null;
+		try {
+			List<Toggle> toggleCollection = new LinkedList<Toggle>();
+			byte[] header = {(byte)0x03, 0x00 };
+			byte[] ret = this.transmitRequest(destination, header, null);
+			if(ret == null || ret.length <= 2)
+				return null;
+			ByteArrayInputStream buffer = new ByteArrayInputStream(ret);
+			byte[] toggleBuffer = new byte[25];
+			int read = 0;
+			if((read = buffer.read(toggleBuffer, 0, 2)) != 2)
+				return null;
+			do {
+				if((read = buffer.read(toggleBuffer, 0, toggleBuffer.length)) == toggleBuffer.length)
+					toggleCollection.add(Toggle.derserialize(toggleBuffer));				
+			} while(read == toggleBuffer.length);
+			return toggleCollection;
+		} catch(Exception e) {
+			return null;
+		}
 	}
 
 	public Collection<Toggle> getLightToggles(int id) {
-		// TODO Auto-generated method stub
-		return null;
+		Multicast destination = null;
+		synchronized(this.mapSyncObject) {
+			destination = this.lightMap.get(Integer.valueOf(id));
+		}
+		if(destination == null)
+			return null;
+		try {
+			List<Toggle> toggleCollection = new LinkedList<Toggle>();
+			byte[] header = {(byte)0x03, 0x00 };
+			byte[] ret = this.transmitRequest(destination, header, null);
+			if(ret == null || ret.length <= 2)
+				return null;
+			ByteArrayInputStream buffer = new ByteArrayInputStream(ret);
+			byte[] toggleBuffer = new byte[25];
+			int read = 0;
+			if((read = buffer.read(toggleBuffer, 0, 2)) != 2)
+				return null;
+			do {
+				if((read = buffer.read(toggleBuffer, 0, toggleBuffer.length)) == toggleBuffer.length)
+					toggleCollection.add(Toggle.derserialize(toggleBuffer));				
+			} while(read == toggleBuffer.length);
+			return toggleCollection;
+		} catch(Exception e) {
+			return null;
+		}
 	}
 
 	public boolean setLightGroup(int lightId, int groupId) {
-		// TODO Auto-generated method stub
-		return false;
+		Multicast address = null;
+		synchronized(this.mapSyncObject) {
+			address = this.lightMap.get(Integer.valueOf(lightId));
+		}
+		try {
+			if(address == null)
+				return false;
+			byte[] header = { (byte)0x80, 0x00 };
+			byte[] data = ByteBuffer.allocate(4).putInt(groupId).array();
+			byte[] ret = transmitRequest(address, header, data);
+			if(ret.length == 2)
+				return ret[0] == header[0] && ret[1] == header[1];
+			else 
+				return false;			
+		} catch(Exception e) {
+			return false;
+		}
 	}
 
-	public boolean setLightColor(int lightId, byte on, byte red, byte greeen, byte blue) {
-		return false;
+	public boolean setLightColor(int lightId, LiteColor color) {
+		Multicast address = null;
+		synchronized(this.mapSyncObject) {
+			address = this.lightMap.get(Integer.valueOf(lightId));
+		}
+		try {
+			if(address == null)
+				return false;
+			byte[] header = { (byte)0x82, 0x00 };
+			byte[] data = color.serialize();
+			byte[] ret = transmitRequest(address, header, data);
+			if(ret.length == 2)
+				return ret[0] == header[0] && ret[1] == header[1];
+			else 
+				return false;	
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
-	public boolean setGroupColor(int groupId, byte on, byte red, byte greeen,
-			byte blue) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean setGroupColor(int groupId, LiteColor color) {
+		LinkedList<Multicast> groupIds = new LinkedList<Multicast>();
+		synchronized(this.mapSyncObject) {
+			for(Multicast m : this.lightMap.values()) {
+				if(m.getGroup() == groupId)
+					groupIds.add(m);
+			}
+		}
+		try {
+			if(groupIds.size() <= 0)
+				return false;
+			byte[] header = { (byte)0x82, 0x00 };
+			byte[] data = color.serialize();
+			for(Multicast address : groupIds) {
+				try {
+					transmitRequest(address, header, data);
+				} catch (Exception e) {
+
+				}
+			}
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
 	public boolean setLightToggles(int lightId, Collection<Toggle> toggle) {
-		// TODO Auto-generated method stub
-		return false;
+		Multicast address = null;
+		synchronized(this.mapSyncObject) {
+			address = this.lightMap.get(Integer.valueOf(lightId));
+		}
+		try {
+			if(address == null)
+				return false;
+			byte[] header = {(byte)0x84, (byte)toggle.size()};
+			byte[] data;
+			ByteArrayOutputStream dataBuffer = new ByteArrayOutputStream();
+			Iterator<Toggle> it = toggle.iterator();
+			while(it.hasNext()) {
+				dataBuffer.write(it.next().serialize());
+			}
+			data = dataBuffer.toByteArray();
+			byte[] ret = this.transmitRequest(address, header, data);
+			if(ret.length != 2)
+				return false;
+			else
+				return ret[0] == header[0] && ret[1] == header[1];
+		} catch (Exception e) {
+			return false;
+		}		
 	}
 
 	public boolean setGroupToggles(int groupId, Collection<Toggle> toggle) {
-		// TODO Auto-generated method stub
-		return false;
+		List<Multicast> groupAddresses = new LinkedList<Multicast>();
+		synchronized(this.mapSyncObject) {
+			for(Multicast m : this.lightMap.values()) {
+				if(m.getGroup() == groupId)
+					groupAddresses.add(m);
+			}
+		}
+		try {
+			if(groupAddresses.size() <= 0)
+				return false;
+			byte[] header = {(byte)0x85, (byte)toggle.size()};
+			byte[] data;
+			ByteArrayOutputStream dataBuffer = new ByteArrayOutputStream();
+			Iterator<Toggle> it = toggle.iterator();
+			while(it.hasNext()) {
+				dataBuffer.write(it.next().serialize());
+			}
+			data = dataBuffer.toByteArray();
+
+			for(Multicast m : groupAddresses){
+				try {
+					this.transmitRequest(m, header, data);
+				} catch (Exception e) {
+
+				}
+			}
+			return true;
+		}
+		catch (Exception e){
+			return false;
+		}
 	}
 
-	public boolean removeAllGroupToggles(int groupId,
-			Collection<Integer> toggleIds) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean removeAllGroupToggles(int groupId) {
+		return setGroupToggles(groupId, new LinkedList<Toggle>());
 	}
 
 	public boolean setLightEnableToggles(int lightId, boolean enabled) {
-		// TODO Auto-generated method stub
-		return false;
+		Multicast address = null;
+		synchronized(this.mapSyncObject) {
+			address = this.lightMap.get(Integer.valueOf(lightId));
+		}
+		try {
+			if(address == null)
+				return false;
+			byte[] header = { (byte)0x86, 0x00 };
+			byte[] data = new byte[1];
+			data[0] = (new Boolean(enabled)).serialize();
+			byte[] ret = transmitRequest(address, header, data);
+			if(ret.length == 2)
+				return ret[0] == header[0] && ret[1] == header[1];
+			else 
+				return false;	
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
 	public boolean setGroupEnableToggles(int groupId, boolean enabled) {
-		// TODO Auto-generated method stub
-		return false;
+		LinkedList<Multicast> groupIds = new LinkedList<Multicast>();
+		synchronized(this.mapSyncObject) {
+			for(Multicast m : this.lightMap.values()) {
+				if(m.getGroup() == groupId)
+					groupIds.add(m);
+			}
+		}
+		try {
+			if(groupIds.size() <= 0)
+				return false;
+			byte[] header = { (byte)0x87, 0x00 };
+			byte[] data = new byte[1];
+			data[0] = (new Boolean(enabled)).serialize();
+			for(Multicast address : groupIds) {
+				try {
+					transmitRequest(address, header, data);
+				} catch (Exception e) {
+
+				}
+			}
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	private byte[] transmitRequest(Multicast destination, byte[] header, byte[] data) throws IOException {
+		Socket socket = new Socket(destination.getAddress(), destination.getPort());
+		DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+		DataInputStream in = new DataInputStream(socket.getInputStream());
+
+		out.write(header, 0, header.length);
+
+		if(data != null)
+			out.write(data, 0, data.length);
+
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		byte[] bufferedData = new byte[1024];
+		int read = 0;
+		do {
+			read = in.read(bufferedData, 0, bufferedData.length);
+			buffer.write(bufferedData, 0, read);
+		} while(read != bufferedData.length);
+
+		in.close();
+		out.close();
+		socket.close();
+
+		return buffer.toByteArray();
 	}
 }
