@@ -27,9 +27,9 @@ public interface Client {
 	
 	public boolean setGroupColor(int groupId, byte on, byte red, byte greeen, byte blue);
 	
-	public boolean setLightToggles(int lightId, Toggle toggle);
+	public boolean setLightToggles(int lightId, Collection<Toggle> toggle);
 	
-	public boolean setGroupToggles(int groupId, Toggle toggle);
+	public boolean setGroupToggles(int groupId, Collection<Toggle> toggle);
 	
 	public boolean removeAllGroupToggles(int groupId, Collection<Integer> toggleIds);
 	
