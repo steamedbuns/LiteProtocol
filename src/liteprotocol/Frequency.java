@@ -16,7 +16,7 @@ public enum Frequency {
 		return value;
 	}
 
-	public Frequency getFrequency(byte value) {
+	public static Frequency valueOf(byte value) {
 		switch(value) {
 		default:
 		case 0:

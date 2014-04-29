@@ -1,5 +1,6 @@
 package liteprotocol;
 
+import java.nio.ByteBuffer;
 import java.util.Date;
 
 
@@ -27,23 +28,22 @@ public class Toggle {
 	}
 	
 	public byte[] serialize() {
-		byte[] ret = new byte[25];
-		
-		return null;
+		return ByteBuffer.allocate(25)
+				.putInt(id)
+				.putLong(on.getTime())
+				.putLong(off.getTime())
+				.put(this.frequency.getValue())
+				.put(color.serialize())
+				.array();
 	}
 	
 	public static Toggle derserialize(byte[] values) {
 		if(values.length != 25)
 			return null;
-		int id = 0;
-		Date on = null;
-		Date off = null;
-		Frequency freq = null;
-		LiteColor color = null;
-		
-		
-		
-		return new Toggle(id, on, off, freq, color);
+		ByteBuffer buffer = ByteBuffer.allocate(25);
+		buffer.put(values);
+		buffer.position(0);		
+		return new Toggle(buffer.getInt(), new Date(buffer.getLong()), new Date(buffer.getLong()), Frequency.valueOf(buffer.get()), LiteColor.deserialize(buffer.array()));
 	}
 
 	/**

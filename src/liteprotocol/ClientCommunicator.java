@@ -25,7 +25,6 @@ public class ClientCommunicator implements Client {
 		mapSyncObject = new Object();
 	}
 	
-	@Override
 	public Collection<Integer> getAllLightIds() {
 		HashSet<Integer> lightIds = new HashSet<Integer>();
 		synchronized(this.mapSyncObject) {
@@ -40,7 +39,6 @@ public class ClientCommunicator implements Client {
 		return lightIds;
 	}
 
-	@Override
 	public Collection<Integer> getAllGroupIds() {
 		HashSet<Integer> groupIds = new HashSet<Integer>();
 		synchronized(this.mapSyncObject) {
@@ -53,75 +51,6 @@ public class ClientCommunicator implements Client {
 			}
 		}
 		return groupIds;
-	}
-
-	@Override
-	public LightState getLightState(int id) {
-		return null;
-	}
-
-	@Override
-	public GroupState getGroup(int id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Collection<Toggle> getGroupToggles(int id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Collection<Toggle> getLightToggles(int id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean setLightGroup(int lightId, int groupId) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean setLightColor(int lightId, byte on, byte red, byte greeen,
-			byte blue) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean setGroupColor(int groupId, byte on, byte red, byte greeen,
-			byte blue) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean setLightEnableToggles(int lightId, boolean enabled) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean setGroupEnableToggles(int groupId, boolean enabled) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean setLightToggleEnabled(int lightId, int toggleId,
-			boolean enabled) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean setGroupToggleEnabled(int groupId, int toggleId,
-			boolean enabled) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 	
 	public void startBroadcastListenThread() {
@@ -207,21 +136,63 @@ public class ClientCommunicator implements Client {
 		}
 	}
 
-	@Override
+	public LightState getLightState(int id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public GroupState getGroup(int id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Collection<Toggle> getGroupToggles(int id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Collection<Toggle> getLightToggles(int id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public boolean setLightGroup(int lightId, int groupId) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean setLightColor(int lightId, byte on, byte red, byte greeen, byte blue) {
+		return false;
+	}
+
+	public boolean setGroupColor(int groupId, byte on, byte red, byte greeen,
+			byte blue) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 	public boolean setLightToggles(int lightId, Collection<Toggle> toggle) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	@Override
 	public boolean setGroupToggles(int groupId, Collection<Toggle> toggle) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	@Override
 	public boolean removeAllGroupToggles(int groupId,
 			Collection<Integer> toggleIds) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean setLightEnableToggles(int lightId, boolean enabled) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean setGroupEnableToggles(int groupId, boolean enabled) {
 		// TODO Auto-generated method stub
 		return false;
 	}
