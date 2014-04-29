@@ -6,6 +6,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
@@ -129,6 +130,7 @@ public class ClientCommunicator implements Client {
 		public void run() {
 			try {
 				listener = new MulticastSocket(Multicast.BROADCAST_PORT);
+				listener.joinGroup( InetAddress.getByName("224.0.0.1"));
 				byte reciveData[] = new byte[10];
 				while(listen) {
 					DatagramPacket packet = new DatagramPacket(reciveData, reciveData.length);
