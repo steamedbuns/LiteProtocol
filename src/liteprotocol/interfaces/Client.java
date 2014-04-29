@@ -36,8 +36,4 @@ public interface Client {
 	public boolean setLightEnableToggles(int lightId, boolean enabled);
 	
 	public boolean setGroupEnableToggles(int groupId, boolean enabled);
-	
-	public boolean setLightToggleEnabled(int lightId, int toggleId, boolean enabled);
-	
-	public boolean setGroupToggleEnabled(int groupId, int toggleId, boolean enabled);
 }

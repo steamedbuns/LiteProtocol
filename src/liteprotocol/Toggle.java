@@ -4,13 +4,11 @@ import java.util.Date;
 
 
 public class Toggle {
-
-	private Date time;
-	private int frequency;
-	private byte red;
-	private byte green;
-	private byte blue;
-	private byte type;
+	private int id;
+	private Date on;
+	private Date off;
+	private byte frequency;
+	private LiteColor color;
 	
 	/**
 	 * @param time
@@ -20,54 +18,58 @@ public class Toggle {
 	 * @param blue
 	 * @param type
 	 */
-	public Toggle(Date time, int frequency, byte red, byte green, byte blue, byte type) {
-		this.time = time;
+	public Toggle(int id, Date on, Date off, byte frequency, LiteColor color) {
+		this.id = id;
+		this.on = on;
+		this.off = off;
 		this.frequency = frequency;
-		this.red = red;
-		this.green = green;
-		this.blue = blue;
-		this.type = type;
+		this.color = color;
+	}
+	
+	public byte[] serialize() {
+		byte[] ret = new byte[25];
+		ByteBuffer buffer = new ByteBuffer(25);
+	}
+	
+	public Toggle derserialize(byte[] values) {
+		if(values.length != 25)
+			return null;
+		
 	}
 
 	/**
-	 * @return the time
+	 * @return the id
 	 */
-	public Date getTime() {
-		return time;
+	public int getId() {
+		return id;
+	}
+
+	/**
+	 * @return the on
+	 */
+	public Date getOn() {
+		return on;
+	}
+
+	/**
+	 * @return the off
+	 */
+	public Date getOff() {
+		return off;
 	}
 
 	/**
 	 * @return the frequency
 	 */
-	public int getFrequency() {
+	public byte getFrequency() {
 		return frequency;
 	}
 
 	/**
-	 * @return the red
+	 * @return the color
 	 */
-	public byte getRed() {
-		return red;
+	public LiteColor getColor() {
+		return color;
 	}
-
-	/**
-	 * @return the green
-	 */
-	public byte getGreen() {
-		return green;
-	}
-
-	/**
-	 * @return the blue
-	 */
-	public byte getBlue() {
-		return blue;
-	}
-
-	/**
-	 * @return the type
-	 */
-	public byte getType() {
-		return type;
-	}
+	
 }
