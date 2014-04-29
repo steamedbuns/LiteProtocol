@@ -223,7 +223,7 @@ public class ClientCommunicator implements Client {
 			return null;
 		try {
 			List<Toggle> toggleCollection = new LinkedList<Toggle>();
-			byte[] header = {(byte)0x03, 0x00 };
+			byte[] header = {(byte)0x02, 0x00 };
 			byte[] ret = this.transmitRequest(destination, header, null);
 			if(ret == null || ret.length <= 2)
 				return null;

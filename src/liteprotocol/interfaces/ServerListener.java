@@ -12,12 +12,12 @@ public interface ServerListener {
 	
 	public void setColor(LiteColor color);
 	
-	public void setToggles(Collection<Toggle> toggle);
+	public void setToggles(Collection<Toggle> toggle, boolean group);
 	
 	public void setEnabledToggles(boolean enabled);
 	
-	public void requestForState(Recipient r);
+	public void requestForColor(Recipient r);
 	
-	public void requestToggles(Recipient r);
+	public void requestToggles(Recipient r, boolean group);
 
 }

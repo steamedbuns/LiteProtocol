@@ -16,11 +16,11 @@ public abstract class Server extends Thread {
 		this.listenerSyncObject = new Object();
 	}
 	
-	public abstract boolean sendColor(Recipient r, LiteColor color);
+	public abstract void sendColor(Recipient r, LiteColor color);
 	
-	public abstract boolean sendToggles(Recipient r, Collection<Toggle> c);
+	public abstract void sendToggles(Recipient r, Collection<Toggle> c);
 	
-	public abstract boolean sendReply(Recipient r);
+	public abstract void sendReply(Recipient r);
 	
 	public boolean addServerListener(ServerListener l) {
 		synchronized(this.listenerSyncObject) {
@@ -50,10 +50,10 @@ public abstract class Server extends Thread {
 		}
 	}
 	
-	public void notifySetToggles(Collection<Toggle> toggle) {
+	public void notifySetToggles(Collection<Toggle> toggle, boolean group) {
 		synchronized(this.listenerSyncObject) {
 			for(ServerListener l : this.listerners){
-				l.setToggles(toggle);
+				l.setToggles(toggle, group);
 			}
 		}
 	}
@@ -66,18 +66,18 @@ public abstract class Server extends Thread {
 		}
 	}
 	
-	public void notifyRequestForState(Recipient r) {
+	public void notifyRequestForColor(Recipient r) {
 		synchronized(this.listenerSyncObject) {
 			for(ServerListener l : this.listerners){
-				l.requestForState(r);
+				l.requestForColor(r);
 			}
 		}
 	}
 	
-	public void notifyRequestToggles(Recipient r) {
+	public void notifyRequestToggles(Recipient r, boolean group) {
 		synchronized(this.listenerSyncObject) {
 			for(ServerListener l : this.listerners){
-				l.requestToggles(r);
+				l.requestToggles(r, group);
 			}
 		}
 	}
