@@ -1,5 +1,7 @@
 package liteprotocol;
 
-public class Recipient {
+import java.net.Socket;
 
+public class Recipient {
+	protected Socket connection;
 }

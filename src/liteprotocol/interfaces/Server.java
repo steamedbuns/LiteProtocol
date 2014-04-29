@@ -12,5 +12,5 @@ public interface Server {
 	
 	public boolean sendToggles(Recipient r, Collection<Toggle> c);
 	
-	public boolean addServerListener(ServerListener l);
+	public void addServerListener(ServerListener l);
 }
