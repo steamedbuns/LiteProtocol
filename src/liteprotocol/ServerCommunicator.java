@@ -1,11 +1,14 @@
 package liteprotocol;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Collection;
+
 import liteprotocol.interfaces.Server;
 import liteprotocol.interfaces.ServerListener;
 
@@ -13,10 +16,15 @@ public class ServerCommunicator extends Thread implements Server{
 	private static final int Recieve_Port = 10356;
 	private ArrayList<ServerListener> publish;
 	private ControlReceiveThread ctlReceiveThread;
+	private BroadcastMessageThread bcastThread;
+	private int id;
+	private int group;
 	
-	public ServerCommunicator() {
+	public ServerCommunicator(int id, int group) {
 		this.publish = new ArrayList<ServerListener>();
-		startCtlThread();
+		startThreads();
+		this.id = id;
+		this.group = group;
 	}
 	
 	@Override
@@ -36,16 +44,52 @@ public class ServerCommunicator extends Thread implements Server{
 		publish.add(l);
 	}
 	
-	public void startCtlThread() {
+	public void startThreads() {
 		if(ctlReceiveThread == null) {
 			ctlReceiveThread = new ControlReceiveThread();
 			ctlReceiveThread.start();
 		}
+		if(bcastThread == null) {
+			bcastThread = new BroadcastMessageThread();
+			bcastThread.start();
+		}
 	}
 	
-	public void stopCtlThread() {
+	public void stopThreads() {
 		ctlReceiveThread.stopRecieving();
 		ctlReceiveThread = null;
+		bcastThread.stopTransmitting();
+		bcastThread = null;
+	}
+	
+	private class BroadcastMessageThread extends Thread {
+		private MulticastSocket broadcastSocket;
+		private boolean broadcast = true;
+		
+		public void run() {
+			try {
+				InetAddress mcGroup = InetAddress.getByName("224.0.0.1");
+				broadcastSocket = new MulticastSocket(Multicast.BROADCAST_PORT);
+				broadcastSocket.setTimeToLive(30);
+				broadcastSocket.setBroadcast(true);
+				while(broadcast) {
+					try{
+						broadcastSocket.send(Multicast.createDatagramPacket(id, group, (short) Recieve_Port, mcGroup));
+						Thread.sleep(1000);
+					} catch (IOException e) {
+					} catch (InterruptedException e) {
+					} 
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} 
+			
+		}
+		
+		public void stopTransmitting() {
+			this.broadcast = false;
+			broadcastSocket.close();
+		}
 	}
 	
 	private class ControlReceiveThread extends Thread {
