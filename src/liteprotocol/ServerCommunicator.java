@@ -2,6 +2,7 @@ package liteprotocol;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -89,8 +90,28 @@ public class ServerCommunicator extends Server {
 						Socket connection = serverSocket.accept();
 						byte[] header = new byte[2];
 						byte[] data = null;
-						Recipient r = new Recipient(connection, header);
-						this.parse(r, data);
+						byte[] byteBuffer = new byte[1024];
+						int read = 0;
+						DataInputStream in = new DataInputStream(connection.getInputStream());
+						ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+						do {
+							read = in.read(byteBuffer, 0, byteBuffer.length);
+							buffer.write(byteBuffer, 0, read);
+						} while(read != byteBuffer.length);
+						data = buffer.toByteArray();
+						if(data.length > 2) {
+							header[0] = data[0];
+							header[1] = data[1];
+							if(data.length > 2) {
+								byte[] temp = new byte[data.length - 2];
+								System.arraycopy(data, 0, temp, 0, temp.length);
+								data = temp;
+							}
+							else 
+								data = null;
+							Recipient r = new Recipient(connection, header);
+							this.parse(r, data);
+						}
 					} catch(SocketTimeoutException e) {
 
 					} catch (IOException e) {
