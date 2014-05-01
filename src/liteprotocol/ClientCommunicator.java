@@ -30,8 +30,8 @@ public class ClientCommunicator implements Client {
 
 	public ClientCommunicator() {
 		lightMap = new HashMap<Integer, Multicast>();
-		startThreads();
 		mapSyncObject = new Object();
+		startThreads();
 	}
 
 	public Collection<Integer> getAllLightIds() {
@@ -42,7 +42,7 @@ public class ClientCommunicator implements Client {
 			}
 			Set<Entry<Integer, Multicast>> entry = lightMap.entrySet();
 			for(Entry<Integer,Multicast> e : entry) {
-				lightIds.add(e.getKey());
+					lightIds.add(e.getKey());
 			}
 		}
 		return lightIds;
@@ -56,7 +56,8 @@ public class ClientCommunicator implements Client {
 			}
 			Set<Entry<Integer, Multicast>> entry = lightMap.entrySet();
 			for(Entry<Integer,Multicast> e : entry) {
-				groupIds.add(e.getValue().getGroup());
+				if(e.getValue().getGroup() != 0)
+					groupIds.add(Integer.valueOf(e.getValue().getGroup()));
 			}
 		}
 		return groupIds;
@@ -75,17 +76,8 @@ public class ClientCommunicator implements Client {
 
 	public void stopThreads() {
 		packetListenThread.stopThread();
-		packetListenThread = null;
 		sweepThread.stopSweep();
-		sweepThread = null;
-	}
-	public void stopBroadcastListenThread() {
-		packetListenThread.stopThread();
 		packetListenThread = null;
-	}
-
-	public void stopSweepThread() {
-		sweepThread.stopSweep();
 		sweepThread = null;
 	}
 
@@ -167,6 +159,8 @@ public class ClientCommunicator implements Client {
 	}
 
 	public GroupState getGroup(int id) {
+		if(id == 0)
+			return null;
 		Set<Integer> lights = new HashSet<Integer>();
 		synchronized(this.mapSyncObject) {
 			for(Multicast m : this.lightMap.values()) {
@@ -428,11 +422,11 @@ public class ClientCommunicator implements Client {
 		Socket socket = new Socket(destination.getAddress(), destination.getPort());
 		DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 		DataInputStream in = new DataInputStream(socket.getInputStream());
-
-		out.write(header, 0, header.length);
-
+		ByteArrayOutputStream outBuffer = new ByteArrayOutputStream();
+		outBuffer.write(header);
 		if(data != null)
-			out.write(data, 0, data.length);
+			outBuffer.write(data);
+		out.write(outBuffer.toByteArray(), 0, outBuffer.size());
 
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		byte[] bufferedData = new byte[1024];
