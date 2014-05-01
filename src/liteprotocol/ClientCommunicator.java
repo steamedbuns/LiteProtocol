@@ -438,7 +438,8 @@ public class ClientCommunicator implements Client {
 		byte[] bufferedData = new byte[1024];
 		int read = 0;
 		do {
-			read = in.read(bufferedData, 0, bufferedData.length);
+			read = in.read(bufferedData, 0, 2);
+			read += in.read(bufferedData, 2, bufferedData.length - 2);
 			if(read > 0)
 				buffer.write(bufferedData, 0, read);
 		} while(read == bufferedData.length);
