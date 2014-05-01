@@ -100,7 +100,7 @@ public class ServerCommunicator extends Server {
 								buffer.write(byteBuffer, 0, read);
 						} while(read == byteBuffer.length);
 						data = buffer.toByteArray();
-						if(data.length > 2) {
+						if(data.length >= 2) {
 							header[0] = data[0];
 							header[1] = data[1];
 							if(data.length > 2) {
