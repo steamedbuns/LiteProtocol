@@ -96,7 +96,8 @@ public class ServerCommunicator extends Server {
 						ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 						do {
 							read = in.read(byteBuffer, 0, byteBuffer.length);
-							buffer.write(byteBuffer, 0, read);
+							if(read > 0)
+								buffer.write(byteBuffer, 0, read);
 						} while(read != byteBuffer.length);
 						data = buffer.toByteArray();
 						if(data.length > 2) {
