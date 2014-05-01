@@ -98,7 +98,7 @@ public class ServerCommunicator extends Server {
 							read = in.read(byteBuffer, 0, byteBuffer.length);
 							if(read > 0)
 								buffer.write(byteBuffer, 0, read);
-						} while(read != byteBuffer.length);
+						} while(read == byteBuffer.length);
 						data = buffer.toByteArray();
 						if(data.length > 2) {
 							header[0] = data[0];
