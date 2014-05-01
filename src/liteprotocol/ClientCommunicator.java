@@ -439,7 +439,8 @@ public class ClientCommunicator implements Client {
 		int read = 0;
 		do {
 			read = in.read(bufferedData, 0, bufferedData.length);
-			buffer.write(bufferedData, 0, read);
+			if(read > 0)
+				buffer.write(bufferedData, 0, read);
 		} while(read != bufferedData.length);
 
 		in.close();
