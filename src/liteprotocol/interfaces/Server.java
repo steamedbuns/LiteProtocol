@@ -6,7 +6,7 @@ import liteprotocol.LiteColor;
 import liteprotocol.Recipient;
 import liteprotocol.Toggle;
 
-public abstract class Server extends Thread {
+public abstract class Server {
 	
 	private Collection<ServerListener> listerners;
 	private Object listenerSyncObject;

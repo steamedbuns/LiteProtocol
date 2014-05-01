@@ -81,7 +81,7 @@ public class ServerCommunicator extends Server {
 	private class ControlReceiveThread extends Thread {
 		private boolean recieve = true;
 		private ServerSocket serverSocket;
-
+		
 		public void run() {
 			try{
 				serverSocket = new ServerSocket(Recieve_Port);
@@ -105,7 +105,7 @@ public class ServerCommunicator extends Server {
 							header[1] = data[1];
 							if(data.length > 2) {
 								byte[] temp = new byte[data.length - 2];
-								System.arraycopy(data, 0, temp, 0, temp.length);
+								System.arraycopy(data, 2, temp, 0, temp.length);
 								data = temp;
 							}
 							else 
