@@ -30,8 +30,7 @@ public class ClientCommunicator implements Client {
 
 	public ClientCommunicator() {
 		lightMap = new HashMap<Integer, Multicast>();
-		startBroadcastListenThread();
-		startSweepThread();
+		startThreads();
 		mapSyncObject = new Object();
 	}
 
@@ -63,20 +62,23 @@ public class ClientCommunicator implements Client {
 		return groupIds;
 	}
 
-	public void startBroadcastListenThread() {
+	public void startThreads() {
 		if(packetListenThread == null) {
 			packetListenThread = new BroadcastListenThread();
-			packetListenThread.start();
 		}
-	}
-
-	public void startSweepThread() {
 		if(sweepThread == null) {
 			sweepThread = new SweepThread();
-			sweepThread.start();
 		}
+		packetListenThread.start();
+		sweepThread.start();
 	}
 
+	public void stopThreads() {
+		packetListenThread.stopThread();
+		packetListenThread = null;
+		sweepThread.stopSweep();
+		sweepThread = null;
+	}
 	public void stopBroadcastListenThread() {
 		packetListenThread.stopThread();
 		packetListenThread = null;
