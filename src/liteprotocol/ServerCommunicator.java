@@ -191,11 +191,12 @@ public class ServerCommunicator extends Server {
 	@Override
 	public void sendColor(Recipient r, LiteColor color) {
 		try {
-			Socket socket = r.getConnection();
 			DataOutputStream out = new DataOutputStream(r.getConnection().getOutputStream());
-			out.write(r.getHeader());
-			out.write(color.serialize());
-			socket.close();
+			ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+			buffer.write(r.getHeader());
+			buffer.write(color.serialize());
+			out.write(buffer.toByteArray());
+			out.close();
 		} catch (Exception e) {
 			
 		}
@@ -205,13 +206,13 @@ public class ServerCommunicator extends Server {
 	public void sendToggles(Recipient r, Collection<Toggle> c) {
 		try {
 			ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+			byte[] header = r.getHeader();
+			header[1] = (byte)c.size();
+			buffer.write(header);
 			for(Toggle t : c) {
 				buffer.write(t.serialize());
 			}
 			DataOutputStream out = new DataOutputStream(r.getConnection().getOutputStream());
-			byte[] header = r.getHeader();
-			header[1] = (byte)c.size();
-			out.write(header);
 			out.write(buffer.toByteArray());
 			out.close();
 		} catch (Exception e) {
