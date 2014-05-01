@@ -192,10 +192,9 @@ public class ServerCommunicator extends Server {
 	public void sendColor(Recipient r, LiteColor color) {
 		try {
 			Socket socket = r.getConnection();
-			System.out.println(r.getHeader()[0] + ", " + r.getHeader()[1]);
-			System.out.println(color.serialize()[0] + ", " + color.serialize()[1] + ", " + color.serialize()[2] + ", " + color.serialize()[3]);
-			socket.getOutputStream().write(r.getHeader());
-			socket.getOutputStream().write(color.serialize());
+			DataOutputStream out = new DataOutputStream(r.getConnection().getOutputStream());
+			out.write(r.getHeader());
+			out.write(color.serialize());
 			socket.close();
 		} catch (Exception e) {
 			
