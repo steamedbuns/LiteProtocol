@@ -12,7 +12,7 @@ import liteprotocol.interfaces.ServerListener;
 public class ServerTestMain {
 
 	public static void main(String[] args) {
-		final ServerCommunicator server = new ServerCommunicator(52, 0);
+		final ServerCommunicator server = new ServerCommunicator(52, 76);
 		server.addServerListener(new ServerListener() {
 			private LiteColor color = new LiteColor(new LightBoolean(false), (byte)255, (byte)255, (byte)255);
 			private Collection<Toggle> ltoggles = new LinkedList<Toggle>();
