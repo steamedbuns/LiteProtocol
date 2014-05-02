@@ -30,7 +30,6 @@ public class ClientCommunicator implements Client {
 	public ClientCommunicator() {
 		lightMap = new HashMap<Integer, Multicast>();
 		mapSyncObject = new Object();
-		startThreads();
 	}
 
 	public Collection<Integer> getAllLightIds() {

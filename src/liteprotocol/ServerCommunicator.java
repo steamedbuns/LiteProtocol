@@ -25,7 +25,6 @@ public class ServerCommunicator extends Server {
 	protected final ServerCommunicator server = this;
 
 	public ServerCommunicator(int id, int group) {
-		startThreads();
 		this.id = id;
 		this.group = group;
 	}
