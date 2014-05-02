@@ -137,31 +137,32 @@ public class ServerCommunicator extends Server {
 			switch(r.getHeader()[0]) {
 			case (byte)0x00: // getState
 				server.notifyRequestForColor(r);
-			break;
+				break;
 			case (byte)0x02: // get light toggles
 				server.notifyRequestToggles(r, false);
-			break;
+				break;
 			case (byte)0x03: // get group toggles
 				server.notifyRequestToggles(r, true);
+				break;
 			case (byte)0x80: // set group
-				if(data.length != 4)
+				if(data == null || data.length != 4)
 					break;
-			server.notifySetGroup(ByteBuffer.allocate(4).put(data).getInt());
-			break;
+				server.notifySetGroup(ByteBuffer.allocate(4).put(data).getInt());
+				break;
 			case (byte)0x82: // set color
-				if(data.length != 4)
+				if(data == null || data.length != 4)
 					break;
-			server.notifySetColor(LiteColor.deserialize(data));
-			break;
+				server.notifySetColor(LiteColor.deserialize(data));
+				break;
 			case (byte)0x84: // set light toggles
 				server.notifySetToggles(this.extractToggles(data), false);
-			break;
+				break;
 			case (byte)0x85: // set group toggles
 				server.notifySetToggles(this.extractToggles(data), true);
-			break;
+				break;
 			case (byte)0x86: // set enabled toggles
 				server.notifySetEnabledToggles(LightBoolean.deserialize(data[0]).getValue());
-			break;
+				break;
 			default:
 				break;
 			}
