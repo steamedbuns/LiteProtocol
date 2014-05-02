@@ -146,7 +146,7 @@ public class ServerCommunicator extends Server {
 			case (byte)0x80: // set group
 				if(data == null || data.length != 4)
 					break;
-				server.notifySetGroup(ByteBuffer.allocate(4).put(data).getInt());
+				server.notifySetGroup(ByteBuffer.wrap(data).getInt());
 				break;
 			case (byte)0x82: // set color
 				if(data == null || data.length != 4)
