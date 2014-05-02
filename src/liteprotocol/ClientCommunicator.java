@@ -35,32 +35,26 @@ public class ClientCommunicator implements Client {
 	}
 
 	public Collection<Integer> getAllLightIds() {
-		HashSet<Integer> lightIds = new HashSet<Integer>();
 		synchronized(this.mapSyncObject) {
 			if(lightMap.size() == 0) {
 				return null;
 			}
-			Set<Entry<Integer, Multicast>> entry = lightMap.entrySet();
-			for(Entry<Integer,Multicast> e : entry) {
-					lightIds.add(e.getKey());
-			}
+			return lightMap.keySet();
 		}
-		return lightIds;
 	}
 
 	public Collection<Integer> getAllGroupIds() {
-		HashSet<Integer> groupIds = new HashSet<Integer>();
 		synchronized(this.mapSyncObject) {
 			if(lightMap.size() == 0) {
 				return null;
 			}
-			Set<Entry<Integer, Multicast>> entry = lightMap.entrySet();
-			for(Entry<Integer,Multicast> e : entry) {
-				if(e.getValue().getGroup() != 0)
-					groupIds.add(Integer.valueOf(e.getValue().getGroup()));
+			HashSet<Integer> groupIds = new HashSet<Integer>();
+			for(Multicast m : lightMap.values()) {
+				if(m.getGroup() != 0)
+					groupIds.add(Integer.valueOf(m.getGroup()));
 			}
+			return groupIds;
 		}
-		return groupIds;
 	}
 
 	public void startThreads() {
@@ -89,12 +83,9 @@ public class ClientCommunicator implements Client {
 
 	private void sweep() {
 		synchronized(this.mapSyncObject) {
-			Set<Entry<Integer, Multicast>> entry = lightMap.entrySet();
-			for(Entry<Integer,Multicast> e : entry) {
-				long currTime = System.currentTimeMillis();
-				if((currTime - e.getValue().getTime()) > timeout) {
-					lightMap.remove(e.getKey());
-				}
+			for(Integer i : lightMap.keySet()) {
+				if((System.currentTimeMillis() - lightMap.get(i).getTime()) > timeout)
+					lightMap.remove(i);
 			}
 		}
 	}
@@ -145,7 +136,9 @@ public class ClientCommunicator implements Client {
 		Multicast broadcast = null;
 		synchronized(this.mapSyncObject) {
 			broadcast = this.lightMap.get(Integer.valueOf(id));
-		}		
+		}	
+		if(broadcast == null)
+			return null;
 		try {
 			byte[] header = {0x00, 0x01};
 			byte[] reply = transmitRequest(broadcast, header, null);
