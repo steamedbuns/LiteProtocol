@@ -56,6 +56,12 @@ public class ServerTestMain {
 				else
 					server.sendToggles(r, ltoggles);
 			}
+
+			@Override
+			public void requestEnabled(Recipient r) {
+				// TODO Auto-generated method stub
+				
+			}
 			
 		});
 		server.startThreads();

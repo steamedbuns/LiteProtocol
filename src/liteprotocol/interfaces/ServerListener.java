@@ -19,5 +19,7 @@ public interface ServerListener {
 	public void requestForColor(Recipient r);
 	
 	public void requestToggles(Recipient r, boolean group);
+	
+	public void requestEnabled(Recipient r);
 
 }
