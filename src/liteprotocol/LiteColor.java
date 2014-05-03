@@ -68,4 +68,8 @@ public class LiteColor {
 	public byte getBlue() {
 		return blue;
 	}
+	
+	public String toString() {
+		return "[Color : On = " + this.on.getValue() + " r = " + (this.red & 0xFF) + " g = " + (this.green & 0xFF) + " b = " + (this.blue & 0xFF) + "]";
+	}
 }

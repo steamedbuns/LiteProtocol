@@ -37,4 +37,8 @@ public class LightState {
 	public LiteColor getColor() {
 		return color;
 	}
+	
+	public String toString() {
+		return "[Light State : ID = " + this.lightId + " Group ID = " + this.groupId + this.color.toString() + "]";
+	}
 }
