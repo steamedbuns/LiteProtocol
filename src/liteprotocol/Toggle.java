@@ -81,4 +81,7 @@ public class Toggle {
 		return color;
 	}
 	
+	public String toString() {
+		return "[Toggle : Toggle ID = " + id + " On Date = " + on.toString() + " Off Date = " + off.toString() + " " + frequency.toString() + color + "]"; 
+	}
 }

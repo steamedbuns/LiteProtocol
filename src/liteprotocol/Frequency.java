@@ -29,4 +29,8 @@ public enum Frequency {
 			return Frequency.Yearly;
 		}
 	}
+	
+	public String toString() {
+		return "Frequency : Value = " + Byte.toString(this.value) + "]";
+	}
 }

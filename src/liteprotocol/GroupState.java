@@ -42,4 +42,8 @@ public class GroupState {
 	public LiteColor getColor() {
 		return color;
 	}
+	
+	public String toString() {
+		return "[Group State : Group Id = " + this.groupID + " Number of lights : " + this.lightIds.size() + this.color.toString() + "]";
+	}
 }
