@@ -80,7 +80,7 @@ public class ServerCommunicator extends Server {
 	private class ControlReceiveThread extends Thread {
 		private boolean recieve = true;
 		private ServerSocket serverSocket;
-		
+
 		public void run() {
 			try{
 				serverSocket = new ServerSocket(Recieve_Port);
@@ -136,32 +136,34 @@ public class ServerCommunicator extends Server {
 			switch(r.getHeader()[0]) {
 			case (byte)0x00: // getState
 				server.notifyRequestForColor(r);
-				break;
+			break;
 			case (byte)0x02: // get light toggles
 				server.notifyRequestToggles(r, false);
-				break;
+			break;
 			case (byte)0x03: // get group toggles
 				server.notifyRequestToggles(r, true);
-				break;
+			break;
+			case (byte)0x04:
+				server.notifyRequestForColor(r);
 			case (byte)0x80: // set group
 				if(data == null || data.length != 4)
 					break;
-				server.notifySetGroup(ByteBuffer.wrap(data).getInt());
-				break;
+			server.notifySetGroup(ByteBuffer.wrap(data).getInt());
+			break;
 			case (byte)0x82: // set color
 				if(data == null || data.length != 4)
 					break;
-				server.notifySetColor(LiteColor.deserialize(data));
-				break;
+			server.notifySetColor(LiteColor.deserialize(data));
+			break;
 			case (byte)0x84: // set light toggles
 				server.notifySetToggles(this.extractToggles(data), false);
-				break;
+			break;
 			case (byte)0x85: // set group toggles
 				server.notifySetToggles(this.extractToggles(data), true);
-				break;
+			break;
 			case (byte)0x86: // set enabled toggles
 				server.notifySetEnabledToggles(LightBoolean.deserialize(data[0]).getValue());
-				break;
+			break;
 			default:
 				break;
 			}
@@ -184,7 +186,12 @@ public class ServerCommunicator extends Server {
 				if(read == toggleBuffer.length)
 					ret.add(Toggle.derserialize(toggleBuffer));
 			} while(read != toggleBuffer.length);
-				return ret;
+			try {
+				buffer.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return ret;
 		}
 	}
 
@@ -197,8 +204,9 @@ public class ServerCommunicator extends Server {
 			buffer.write(color.serialize());
 			out.write(buffer.toByteArray());
 			out.close();
+			buffer.close();
 		} catch (Exception e) {
-			
+
 		}
 	}
 
@@ -215,8 +223,24 @@ public class ServerCommunicator extends Server {
 			DataOutputStream out = new DataOutputStream(r.getConnection().getOutputStream());
 			out.write(buffer.toByteArray());
 			out.close();
+			buffer.close();
 		} catch (Exception e) {
-			
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void sendTogglesEnabled(Recipient r, boolean enabled) {
+		try {
+			ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+			buffer.write(r.getHeader());
+			buffer.write((new LightBoolean(enabled).serialize()));
+			DataOutputStream out  = new DataOutputStream(r.getConnection().getOutputStream());
+			out.write(buffer.toByteArray());
+			out.close();
+			buffer.close();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -227,7 +251,7 @@ public class ServerCommunicator extends Server {
 			out.write(r.getHeader());
 			out.close();
 		} catch(Exception e) {
-			
+			e.printStackTrace();
 		}
 	}
 

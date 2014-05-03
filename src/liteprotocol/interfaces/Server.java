@@ -24,6 +24,8 @@ public abstract class Server {
 	
 	public abstract boolean setGroupId(int groupId);
 	
+	public abstract void sendTogglesEnabled(Recipient r, boolean enabled);
+	
 	public boolean addServerListener(ServerListener l) {
 		synchronized(this.listenerSyncObject) {
 			return this.listerners.add(l);
