@@ -42,8 +42,11 @@ public class Toggle {
 			return null;
 		ByteBuffer buffer = ByteBuffer.allocate(25);
 		buffer.put(values);
+		buffer.position(21);
+		byte[] colors = new byte[4];
+		buffer.get(colors);
 		buffer.position(0);		
-		return new Toggle(buffer.getInt(), new Date(buffer.getLong()), new Date(buffer.getLong()), Frequency.valueOf(buffer.get()), LiteColor.deserialize(buffer.array()));
+		return new Toggle(buffer.getInt(), new Date(buffer.getLong()), new Date(buffer.getLong()), Frequency.valueOf(buffer.get()), LiteColor.deserialize(colors));
 	}
 
 	/**
@@ -82,6 +85,6 @@ public class Toggle {
 	}
 	
 	public String toString() {
-		return "[Toggle : Toggle ID = " + id + " On Date = " + on.toString() + " Off Date = " + off.toString() + " " + frequency.toString() + color + "]"; 
+		return "[Toggle : Toggle ID = " + id + " On Date = " + on.toString() + " Off Date = " + off.toString() + " " + frequency.toString() + " " + color + "]"; 
 	}
 }

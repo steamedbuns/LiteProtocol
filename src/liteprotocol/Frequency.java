@@ -31,6 +31,6 @@ public enum Frequency {
 	}
 	
 	public String toString() {
-		return "Frequency : Value = " + Byte.toString(this.value) + "]";
+		return "[Frequency : Value = " + (this.value & 0xFF) + "]";
 	}
 }
