@@ -164,6 +164,8 @@ public class ClientCommunicator implements Client {
 			if(lights.isEmpty())
 				return null;
 			LightState state = getLightState(lights.iterator().next().intValue());
+			if(state == null)
+				return null;
 			return new GroupState(id, lights, state.getColor());
 		} catch (Exception e) {		
 			return null;
