@@ -178,6 +178,8 @@ public class ServerCommunicator extends Server {
 
 		private Collection<Toggle> extractToggles(byte[] data) {
 			Collection<Toggle> ret = new LinkedList<Toggle>();
+			if(data == null)
+				return ret;
 			int read = 0;
 			ByteArrayInputStream buffer = new ByteArrayInputStream(data);
 			byte[] toggleBuffer = new byte[25];
