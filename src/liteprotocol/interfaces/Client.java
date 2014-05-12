@@ -1,6 +1,8 @@
 package liteprotocol.interfaces;
 
 import java.util.Collection;
+import java.util.Set;
+
 import liteprotocol.GroupState;
 import liteprotocol.LightState;
 import liteprotocol.LiteColor;
@@ -9,9 +11,9 @@ import liteprotocol.Toggle;
 
 public interface Client {
 
-	public Collection<Integer> getAllLightIds();
+	public Set<Integer> getAllLightIds();
 	
-	public Collection<Integer> getAllGroupIds();
+	public Set<Integer> getAllGroupIds();
 	
 	public LightState getLightState(int id);
 		

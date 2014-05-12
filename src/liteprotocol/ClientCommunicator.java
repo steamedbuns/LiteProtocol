@@ -32,7 +32,7 @@ public class ClientCommunicator implements Client {
 		mapSyncObject = new Object();
 	}
 
-	public Collection<Integer> getAllLightIds() {
+	public Set<Integer> getAllLightIds() {
 		synchronized(this.mapSyncObject) {
 			if(lightMap.size() == 0) {
 				return null;
@@ -41,7 +41,7 @@ public class ClientCommunicator implements Client {
 		}
 	}
 
-	public Collection<Integer> getAllGroupIds() {
+	public Set<Integer> getAllGroupIds() {
 		synchronized(this.mapSyncObject) {
 			if(lightMap.size() == 0) {
 				return null;
